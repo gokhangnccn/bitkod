@@ -1,5 +1,6 @@
 package com.gokhan.bitcode.controller;
 
+import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +19,26 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserEntity>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<ApiResponse<List<UserEntity>>> getAllUsers() {
+        List<UserEntity> users = userService.getAllUsers();
+        return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserEntity>> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(user -> ResponseEntity.ok(ApiResponse.success(user)))
+                .orElseGet(() -> ResponseEntity.status(404)
+                        .body(ApiResponse.userNotFound()));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        if (userService.getUserById(id).isEmpty()) {
+            return ResponseEntity.status(404).body(ApiResponse.userNotFound());
+        }
+
         userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null, 204));
     }
 }
