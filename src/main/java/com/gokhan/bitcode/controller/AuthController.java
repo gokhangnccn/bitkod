@@ -4,18 +4,10 @@ import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.AuthResponse;
 import com.gokhan.bitcode.dtos.LoginRequest;
 import com.gokhan.bitcode.dtos.RegisterRequest;
-import com.gokhan.bitcode.entity.UserEntity;
-import com.gokhan.bitcode.enums.Role;
-import com.gokhan.bitcode.repository.UserRepository;
 import com.gokhan.bitcode.service.AuthService;
-import com.gokhan.bitcode.utils.JwtService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")

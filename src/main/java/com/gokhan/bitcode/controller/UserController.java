@@ -20,25 +20,16 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserEntity>>> getAllUsers() {
-        List<UserEntity> users = userService.getAllUsers();
-        return ResponseEntity.ok(ApiResponse.success(users));
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserEntity>> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
-                .map(user -> ResponseEntity.ok(ApiResponse.success(user)))
-                .orElseGet(() -> ResponseEntity.status(404)
-                        .body(ApiResponse.userNotFound()));
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
-        if (userService.getUserById(id).isEmpty()) {
-            return ResponseEntity.status(404).body(ApiResponse.userNotFound());
-        }
-
-        userService.deleteUserById(id);
-        return ResponseEntity.ok(ApiResponse.success(null, 204));
+        return ResponseEntity.ok(userService.deleteUserById(id));
     }
 }
