@@ -1,6 +1,8 @@
 package com.gokhan.bitcode.configuration;
 
+import com.gokhan.bitcode.service.CustomAccessDeniedHandler;
 import com.gokhan.bitcode.service.CustomUserDetailsService;
+import com.gokhan.bitcode.service.CustomAuthEntryPoint;
 import com.gokhan.bitcode.utils.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +23,15 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthEntryPoint customAuthEntryPoint;
 
-    public SecurityConfig(JwtFilter jwtFilter, CustomUserDetailsService userDetailsService) {
+
+    public SecurityConfig(JwtFilter jwtFilter, CustomUserDetailsService userDetailsService, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthEntryPoint customAuthEntryPoint) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
+        this.accessDeniedHandler = customAccessDeniedHandler;
+        this.customAuthEntryPoint = customAuthEntryPoint;
     }
 
     @Bean
@@ -33,8 +40,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll() // sonradan admin rolü eklemeliyiz
+                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/problems/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider())
