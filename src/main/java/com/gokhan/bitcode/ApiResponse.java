@@ -31,7 +31,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, 0, "BIT-0000", "Successful", data);
+        return new ApiResponse<>(true, 200, "BIT-0000", "Successful", data);
     }
 
     public static <T> ApiResponse<T> success(T data, int resultCode) {
