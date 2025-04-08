@@ -1,6 +1,5 @@
 package com.gokhan.bitcode.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gokhan.bitcode.enums.Difficulty;
 import jakarta.persistence.*;
 import lombok.*;
