@@ -2,9 +2,12 @@ package com.gokhan.bitcode.service;
 
 import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
+import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
+import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import com.gokhan.bitcode.utils.UserClaims;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +20,44 @@ public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
 
+    private final CodeExecutionService codeExecutionService;
+
+    private final ProblemRepository problemRepository;
+
+
+    @Transactional
     public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission, UserClaims userClaims) {
+        boolean alreadySolved = submissionRepository.existsByUserIdAndProblemIdAndPassedTrue(
+                Long.valueOf(userClaims.getUserId()), submission.getProblemId()
+        );
+
+        if (alreadySolved) {
+            return ApiResponse.badRequest("BIT-3004", "Bu soruyu zaten başarıyla çözdünüz. Tekrar çözemezsiniz.");
+        }
         try {
             submission.setUserId(Long.valueOf(userClaims.getUserId()));
             submission.setSubmittedAt(LocalDateTime.now());
+
+            // İlgili problemi getiriyoruz
+            ProblemEntity problem = problemRepository.findById(submission.getProblemId())
+                    .orElse(null);
+
+            if (problem == null) {
+                return ApiResponse.problemNotFound();
+            }
+
+            // Kod derlenip çalıştırılıyor, test case'lerle değerlendirme yapılıyor
+            codeExecutionService.executeAndEvaluateCode(submission, problem);
+
+            // Test sonucu ile birlikte veritabanına kaydediyoruz
             SubmissionEntity saved = submissionRepository.save(submission);
             return ApiResponse.success(saved);
+
         } catch (Exception e) {
-            return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu.");
+            return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu: " + e.getMessage());
         }
     }
+
 
     public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserId(Long userId, UserClaims userClaims) {
         if (!userClaims.getUserId().equals(String.valueOf(userId)) &&
@@ -77,4 +108,13 @@ public class SubmissionService {
             return ApiResponse.badRequest("BIT-3003", "Başarılı gönderimler alınırken bir hata oluştu.");
         }
     }
+
+    public ApiResponse<List<Long>> getSolvedProblemsByUser(Long userId, UserClaims userClaims) {
+        if (!userClaims.getUserId().equals(String.valueOf(userId)) && !"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
+            return ApiResponse.forbidden("Sadece kendi çözdüğünüz soruları görebilirsiniz.");
+        }
+        List<Long> solvedIds = submissionRepository.findSolvedProblemIdsByUserId(userId);
+        return ApiResponse.success(solvedIds);
+    }
+
 }
