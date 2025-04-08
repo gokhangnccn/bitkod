@@ -25,18 +25,19 @@ public class UserService {
     }
 
     public ApiResponse<UserEntity> getUserById(Long id, UserClaims userClaims) {
-        boolean isAdmin = "ADMIN".equalsIgnoreCase(userClaims.getRole());
-        boolean isOwner = userClaims.getUserId().equals(String.valueOf(id));
-
-        if (!isAdmin && !isOwner) {
-            return ApiResponse.forbidden("Sadece kendi bilgilerinizi görüntüleyebilirsiniz.");
-        }
-
         return userRepository.findById(id)
-                .map(ApiResponse::success)
+                .map(user -> {
+                    boolean isAdmin = "ADMIN".equalsIgnoreCase(userClaims.getRole());
+                    boolean isOwner = user.getId().toString().equals(userClaims.getUserId());
+
+                    if (!isAdmin && !isOwner) {
+                        return ApiResponse.<UserEntity>forbidden("Sadece kendi bilgilerinizi görüntüleyebilirsiniz.");
+                    }
+
+                    return ApiResponse.success(user);
+                })
                 .orElse(ApiResponse.userNotFound());
     }
-
 
     public ApiResponse<Void> deleteUserById(Long id, UserClaims userClaims) {
         if (!userClaims.getRole().equalsIgnoreCase("ADMIN")) {

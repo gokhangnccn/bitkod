@@ -29,36 +29,26 @@ public class ProblemService {
     }
 
     public ApiResponse<ProblemEntity> createProblem(ProblemEntity problemEntity, UserClaims userClaims) {
-        try {
-            problemEntity.setCreatedBy(userClaims.getUserId());
-            problemEntity.setCreatedAt(LocalDateTime.now());
+        problemEntity.setCreatedBy(userClaims.getUserId());
+        problemEntity.setCreatedAt(LocalDateTime.now());
 
-            ProblemEntity saved = problemRepository.save(problemEntity);
-            return ApiResponse.success(saved);
-        } catch (Exception e) {
-            return ApiResponse.badRequest("BIT-2001", "Problem oluşturulurken hata oluştu.");
-        }
+        ProblemEntity saved = problemRepository.save(problemEntity);
+        return ApiResponse.success(saved);
     }
 
     public ApiResponse<ProblemEntity> updateProblem(Long id, ProblemEntity updatedProblem, UserClaims userClaims) {
-        ProblemEntity existing = problemRepository.findById(id).orElse(null);
+        return problemRepository.findById(id)
+                .map(existing -> {
+                    existing.setTitle(updatedProblem.getTitle());
+                    existing.setDescription(updatedProblem.getDescription());
+                    existing.setDifficulty(updatedProblem.getDifficulty());
+                    existing.setExampleInput(updatedProblem.getExampleInput());
+                    existing.setExampleOutput(updatedProblem.getExampleOutput());
 
-        if (existing == null) {
-            return ApiResponse.problemNotFound();
-        }
-
-        try {
-            existing.setTitle(updatedProblem.getTitle());
-            existing.setDescription(updatedProblem.getDescription());
-            existing.setDifficulty(updatedProblem.getDifficulty());
-            existing.setExampleInput(updatedProblem.getExampleInput());
-            existing.setExampleOutput(updatedProblem.getExampleOutput());
-
-            ProblemEntity saved = problemRepository.save(existing);
-            return ApiResponse.success(saved);
-        } catch (Exception e) {
-            return ApiResponse.badRequest("BIT-2002", "Problem güncellenirken bir hata oluştu.");
-        }
+                    ProblemEntity saved = problemRepository.save(existing);
+                    return ApiResponse.success(saved);
+                })
+                .orElse(ApiResponse.problemNotFound());
     }
 
     public ApiResponse<Void> deleteProblem(Long id, UserClaims userClaims) {
@@ -67,14 +57,11 @@ public class ProblemService {
         }
 
         if (!"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
-            return ApiResponse.unauthorized();
+            return ApiResponse.forbidden("Sadece admin kullanıcılar problem silebilir.");
         }
 
-        try {
-            problemRepository.deleteById(id);
-            return ApiResponse.success(null);
-        } catch (Exception e) {
-            return ApiResponse.badRequest("BIT-2003", "Problem silinirken hata oluştu.");
-        }
+        problemRepository.deleteById(id);
+        return ApiResponse.success(null);
     }
 }
+

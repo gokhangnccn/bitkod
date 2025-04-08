@@ -29,9 +29,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
     @GetMapping("/me")
-    public ResponseEntity<UserClaims> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<ApiResponse<UserClaims>> getCurrentUser(Authentication authentication) {
         UserClaims userClaims = (UserClaims) authentication.getPrincipal();
-        return ResponseEntity.ok(userClaims);
+        return ResponseEntity.ok(ApiResponse.success(userClaims));
     }
 }

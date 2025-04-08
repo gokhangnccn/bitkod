@@ -4,8 +4,10 @@ import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
 import com.gokhan.bitcode.entity.SubmissionEntity;
 import com.gokhan.bitcode.service.SubmissionService;
+import com.gokhan.bitcode.utils.UserClaims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,28 +20,37 @@ public class SubmissionController {
     private final SubmissionService submissionService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SubmissionEntity>> createSubmission(@RequestBody SubmissionEntity submission) {
-        ApiResponse<SubmissionEntity> response = submissionService.createSubmission(submission);
+    public ResponseEntity<ApiResponse<SubmissionEntity>> createSubmission(@RequestBody SubmissionEntity submission,
+                                                                          Authentication authentication) {
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        ApiResponse<SubmissionEntity> response = submissionService.createSubmission(submission, userClaims);
         return ResponseEntity.status(response.getResultCode()).body(response);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<SubmissionEntity>>> getSubmissionsByUserId(@PathVariable Long userId) {
-        ApiResponse<List<SubmissionEntity>> response = submissionService.getSubmissionsByUserId(userId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<List<SubmissionEntity>>> getSubmissionsByUserId(@PathVariable Long userId,
+                                                                                      Authentication authentication) {
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        ApiResponse<List<SubmissionEntity>> response = submissionService.getSubmissionsByUserId(userId, userClaims);
+        return ResponseEntity.status(response.getResultCode()).body(response);
     }
 
     @GetMapping("/user/{userId}/problem/{problemId}")
     public ResponseEntity<ApiResponse<List<SubmissionEntity>>> getByUserAndProblem(
             @PathVariable Long userId,
-            @PathVariable Long problemId) {
-        ApiResponse<List<SubmissionEntity>> response = submissionService.getSubmissionsByUserIdAndProblemId(userId, problemId);
-        return ResponseEntity.ok(response);
+            @PathVariable Long problemId,
+            Authentication authentication) {
+
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        ApiResponse<List<SubmissionEntity>> response = submissionService.getSubmissionsByUserIdAndProblemId(userId, problemId, userClaims);
+        return ResponseEntity.status(response.getResultCode()).body(response);
     }
 
     @GetMapping("/user/{userId}/stats")
-    public ResponseEntity<ApiResponse<SubmissionStatsDTO>> getUserStats(@PathVariable Long userId) {
-        ApiResponse<SubmissionStatsDTO> response = submissionService.getUserSubmissionStats(userId);
+    public ResponseEntity<ApiResponse<SubmissionStatsDTO>> getUserStats(@PathVariable Long userId,
+                                                                        Authentication authentication) {
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        ApiResponse<SubmissionStatsDTO> response = submissionService.getUserSubmissionStats(userId, userClaims);
         return ResponseEntity.status(response.getResultCode()).body(response);
     }
 
