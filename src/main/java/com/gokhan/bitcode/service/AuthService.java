@@ -8,9 +8,7 @@ import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.enums.Role;
 import com.gokhan.bitcode.repository.UserRepository;
 import com.gokhan.bitcode.utils.JwtService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import com.gokhan.bitcode.utils.UserClaims;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,19 +16,17 @@ import java.time.LocalDateTime;
 
 @Service
 public class AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService,
-                       AuthenticationManager authenticationManager) {
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
     }
 
     public ApiResponse<AuthResponse> register(RegisterRequest request) {
@@ -47,24 +43,31 @@ public class AuthService {
         user.setRole(Role.USER);
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getUsername());
+        UserClaims claims = new UserClaims(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        String token = jwtService.generateToken(claims);
         return ApiResponse.success(new AuthResponse(token));
     }
 
     public ApiResponse<AuthResponse> login(LoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.username(), request.password())
-            );
-        } catch (BadCredentialsException e) {
+        UserEntity user = userRepository.findByUsername(request.username())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             return ApiResponse.badRequest("BIT-1007", "Invalid username or password");
-        } catch (Exception e) {
-            return ApiResponse.serverError();
         }
 
-        String token = jwtService.generateToken(request.username());
+        UserClaims claims = new UserClaims(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        String token = jwtService.generateToken(claims);
         return ApiResponse.success(new AuthResponse(token));
     }
-
 }
-

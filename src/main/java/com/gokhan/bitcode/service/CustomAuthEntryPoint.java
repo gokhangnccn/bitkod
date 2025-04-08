@@ -21,7 +21,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
-        ApiResponse<Object> responseBody = ApiResponse.unauthorized();
+        ApiResponse<Object> responseBody = ApiResponse.unauthorized("Kimlik doğrulama başarısız. Giriş yapmanız gerekmektedir.");
 
         new ObjectMapper().writeValue(response.getOutputStream(), responseBody);
     }

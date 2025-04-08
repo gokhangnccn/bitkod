@@ -16,39 +16,30 @@ public class JwtService {
     private String jwtSecret;
 
     @Value("${jwt.expiration}")
-
     private Long jwtExpirationMs;
 
-    public String generateToken(String username) {
+    public String generateToken(UserClaims userClaims) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userClaims.getUserId())
+                .claim("email", userClaims.getEmail())
+                .claim("role", userClaims.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder()
+    public UserClaims extractUserClaims(String token) {
+        var claims = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+                .getBody();
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration()
-                .before(new Date());
+        return new UserClaims(
+                claims.getSubject(),
+                claims.get("email", String.class),
+                claims.get("role", String.class)
+        );
     }
 }

@@ -32,7 +32,7 @@ public class UserService {
         }
         try {
             userRepository.deleteById(id);
-            return ApiResponse.success(null, 204);
+            return ApiResponse.success(null);
         } catch (Exception e) {
             return ApiResponse.badRequest("BIT-1003", "Kullanıcı silinirken bir hata oluştu.");
         }

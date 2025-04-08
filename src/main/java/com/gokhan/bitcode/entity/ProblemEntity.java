@@ -1,8 +1,11 @@
 package com.gokhan.bitcode.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gokhan.bitcode.enums.Difficulty;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "problems")
@@ -32,4 +35,8 @@ public class ProblemEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String exampleOutput;
+
+    private String createdBy;
+
+    private LocalDateTime createdAt;
 }

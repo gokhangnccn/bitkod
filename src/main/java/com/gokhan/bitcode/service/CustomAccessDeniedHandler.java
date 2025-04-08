@@ -21,8 +21,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
 
-        ApiResponse<Object> apiResponse = ApiResponse.badRequest("BIT-400", "Bad Request");
+        ApiResponse<Object> apiResponse = ApiResponse.forbidden("Bu işlemi yapmaya yetkiniz yok.");
 
         new ObjectMapper().writeValue(response.getOutputStream(), apiResponse);
     }
+
 }
