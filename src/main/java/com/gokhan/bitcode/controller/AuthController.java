@@ -5,8 +5,9 @@ import com.gokhan.bitcode.dtos.AuthResponse;
 import com.gokhan.bitcode.dtos.LoginRequest;
 import com.gokhan.bitcode.dtos.RegisterRequest;
 import com.gokhan.bitcode.service.AuthService;
+import com.gokhan.bitcode.utils.UserClaims;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,5 +28,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<UserClaims> getCurrentUser(Authentication authentication) {
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        return ResponseEntity.ok(userClaims);
     }
 }

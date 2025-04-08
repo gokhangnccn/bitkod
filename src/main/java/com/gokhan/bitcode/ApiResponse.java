@@ -34,16 +34,24 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, 200, "BIT-0000", "Successful", data);
     }
 
-    public static <T> ApiResponse<T> success(T data, int resultCode) {
-        return new ApiResponse<>(true, resultCode, "BIT-0000", "Successful", data);
-    }
-
     public static <T> ApiResponse<T> serverError() {
         return new ApiResponse<>(false, 500, "BIT-500", "Internal Server Error", null);
     }
 
+    public static <T> ApiResponse<T> serverError(String label, String message) {
+        return new ApiResponse<>(false, 500, label, message, null);
+    }
+
     public static <T> ApiResponse<T> unauthorized() {
         return new ApiResponse<>(false, 401, "BIT-401", "Unauthorized", null);
+    }
+
+    public static <T> ApiResponse<T> unauthorized(String message) {
+        return new ApiResponse<>(false, 401, "BIT-401", message, null);
+    }
+
+    public static <T> ApiResponse<T> forbidden(String message) {
+        return new ApiResponse<>(false, 403, "BIT-403", message, null);
     }
 
     public static <T> ApiResponse<T> badRequest(String label, String message) {
@@ -55,23 +63,23 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> userNotFound() {
-        return new ApiResponse<>(false, 1001, "BIT-1001", "User not found", null);
+        return notFound("BIT-1001", "User not found");
     }
 
     public static <T> ApiResponse<T> problemNotFound() {
-        return new ApiResponse<>(false, 1002, "BIT-1002", "Problem not found", null);
+        return notFound("BIT-1002", "Problem not found");
     }
 
     public static <T> ApiResponse<T> testCaseMismatch() {
-        return new ApiResponse<>(false, 1003, "BIT-1003", "Test case output mismatch", null);
+        return badRequest("BIT-1003", "Test case output mismatch");
     }
 
     public static <T> ApiResponse<T> codeExecutionError() {
-        return new ApiResponse<>(false, 1004, "BIT-1004", "Code execution failed", null);
+        return serverError("BIT-1004", "Code execution failed");
     }
 
     public static <T> ApiResponse<T> llmFeedbackUnavailable() {
-        return new ApiResponse<>(false, 1005, "BIT-1005", "LLM feedback service unavailable", null);
+        return serverError("BIT-1005", "LLM feedback service unavailable");
     }
     @JsonIgnore
     public boolean getSucceeded() {

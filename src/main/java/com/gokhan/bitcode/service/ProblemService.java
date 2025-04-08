@@ -3,8 +3,10 @@ package com.gokhan.bitcode.service;
 import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.repository.ProblemRepository;
+import com.gokhan.bitcode.utils.UserClaims;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,8 +28,11 @@ public class ProblemService {
                 .orElse(ApiResponse.problemNotFound());
     }
 
-    public ApiResponse<ProblemEntity> createProblem(ProblemEntity problemEntity) {
+    public ApiResponse<ProblemEntity> createProblem(ProblemEntity problemEntity, UserClaims userClaims) {
         try {
+            problemEntity.setCreatedBy(userClaims.getUserId());
+            problemEntity.setCreatedAt(LocalDateTime.now());
+
             ProblemEntity saved = problemRepository.save(problemEntity);
             return ApiResponse.success(saved);
         } catch (Exception e) {
@@ -35,7 +40,7 @@ public class ProblemService {
         }
     }
 
-    public ApiResponse<ProblemEntity> updateProblem(Long id, ProblemEntity updatedProblem) {
+    public ApiResponse<ProblemEntity> updateProblem(Long id, ProblemEntity updatedProblem, UserClaims userClaims) {
         ProblemEntity existing = problemRepository.findById(id).orElse(null);
 
         if (existing == null) {
@@ -56,10 +61,15 @@ public class ProblemService {
         }
     }
 
-    public ApiResponse<Void> deleteProblem(Long id) {
+    public ApiResponse<Void> deleteProblem(Long id, UserClaims userClaims) {
         if (!problemRepository.existsById(id)) {
             return ApiResponse.problemNotFound();
         }
+
+        if (!"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
+            return ApiResponse.unauthorized();
+        }
+
         try {
             problemRepository.deleteById(id);
             return ApiResponse.success(null);
