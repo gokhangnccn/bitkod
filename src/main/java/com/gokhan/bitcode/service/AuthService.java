@@ -43,13 +43,7 @@ public class AuthService {
         user.setRole(Role.USER);
         userRepository.save(user);
 
-        UserClaims claims = new UserClaims(
-                user.getId().toString(),
-                user.getEmail(),
-                user.getRole().name()
-        );
-
-        String token = jwtService.generateToken(claims);
+        String token = generateTokenFromUser(user);
         return ApiResponse.success(new AuthResponse(token));
     }
 
@@ -61,13 +55,16 @@ public class AuthService {
             return ApiResponse.badRequest("BIT-1007", "Invalid username or password");
         }
 
+        String token = generateTokenFromUser(user);
+        return ApiResponse.success(new AuthResponse(token));
+    }
+
+    private String generateTokenFromUser(UserEntity user) {
         UserClaims claims = new UserClaims(
                 user.getId().toString(),
                 user.getEmail(),
                 user.getRole().name()
         );
-
-        String token = jwtService.generateToken(claims);
-        return ApiResponse.success(new AuthResponse(token));
+        return jwtService.generateToken(claims);
     }
 }

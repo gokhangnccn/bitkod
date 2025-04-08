@@ -31,7 +31,7 @@ public class ProblemController {
     @PostMapping("/createproblem")
     public ResponseEntity<ApiResponse<ProblemEntity>> createProblem(@RequestBody ProblemEntity problemEntity,
                                                                     Authentication authentication) {
-        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        var userClaims = (UserClaims) authentication.getPrincipal();
         return ResponseEntity.ok(problemService.createProblem(problemEntity, userClaims));
     }
 
@@ -39,14 +39,15 @@ public class ProblemController {
     public ResponseEntity<ApiResponse<ProblemEntity>> updateProblem(@PathVariable Long id,
                                                                     @RequestBody ProblemEntity updatedProblem,
                                                                     Authentication authentication) {
-        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        var userClaims = (UserClaims) authentication.getPrincipal();
         return ResponseEntity.ok(problemService.updateProblem(id, updatedProblem, userClaims));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProblem(@PathVariable Long id,
                                                            Authentication authentication) {
-        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        var userClaims = (UserClaims) authentication.getPrincipal();
         return ResponseEntity.ok(problemService.deleteProblem(id, userClaims));
     }
 }
+

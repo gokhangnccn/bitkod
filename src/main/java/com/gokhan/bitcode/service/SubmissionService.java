@@ -4,6 +4,7 @@ import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
 import com.gokhan.bitcode.entity.SubmissionEntity;
 import com.gokhan.bitcode.repository.SubmissionRepository;
+import com.gokhan.bitcode.utils.UserClaims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,9 @@ public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
 
-    public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission) {
+    public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission, UserClaims userClaims) {
         try {
+            submission.setUserId(Long.valueOf(userClaims.getUserId()));
             submission.setSubmittedAt(LocalDateTime.now());
             SubmissionEntity saved = submissionRepository.save(submission);
             return ApiResponse.success(saved);
@@ -26,17 +28,28 @@ public class SubmissionService {
         }
     }
 
-    public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserId(Long userId) {
-        List<SubmissionEntity> submissions = submissionRepository.findByUserId(userId);
-        return ApiResponse.success(submissions);
+    public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserId(Long userId, UserClaims userClaims) {
+        if (!userClaims.getUserId().equals(String.valueOf(userId)) &&
+                !"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
+            return ApiResponse.forbidden("Sadece kendi gönderimlerinizi görüntüleyebilirsiniz.");
+        }
+        return ApiResponse.success(submissionRepository.findByUserId(userId));
     }
 
-    public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserIdAndProblemId(Long userId, Long problemId) {
-        List<SubmissionEntity> submissions = submissionRepository.findByUserIdAndProblemId(userId, problemId);
-        return ApiResponse.success(submissions);
+    public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserIdAndProblemId(Long userId, Long problemId, UserClaims userClaims) {
+        if (!userClaims.getUserId().equals(String.valueOf(userId)) &&
+                !"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
+            return ApiResponse.forbidden("Sadece kendi gönderimlerinizi görüntüleyebilirsiniz.");
+        }
+        return ApiResponse.success(submissionRepository.findByUserIdAndProblemId(userId, problemId));
     }
 
-    public ApiResponse<SubmissionStatsDTO> getUserSubmissionStats(Long userId) {
+    public ApiResponse<SubmissionStatsDTO> getUserSubmissionStats(Long userId, UserClaims userClaims) {
+        if (!userClaims.getUserId().equals(String.valueOf(userId)) &&
+                !"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
+            return ApiResponse.forbidden("Sadece kendi istatistiklerinizi görüntüleyebilirsiniz.");
+        }
+
         try {
             long total = submissionRepository.countByUserId(userId);
             long successful = submissionRepository.countByUserIdAndPassedTrue(userId);
@@ -57,7 +70,11 @@ public class SubmissionService {
     }
 
     public ApiResponse<List<SubmissionEntity>> getSuccessfulSubmissionsByProblemId(Long problemId) {
-        List<SubmissionEntity> submissions = submissionRepository.findByProblemIdAndPassedTrue(problemId);
-        return ApiResponse.success(submissions);
+        try {
+            List<SubmissionEntity> submissions = submissionRepository.findByProblemIdAndPassedTrue(problemId);
+            return ApiResponse.success(submissions);
+        } catch (Exception e) {
+            return ApiResponse.badRequest("BIT-3003", "Başarılı gönderimler alınırken bir hata oluştu.");
+        }
     }
 }
