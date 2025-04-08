@@ -1,0 +1,9 @@
+services:
+  code-runner:
+    build:
+      context: ./docker/code-runner
+    container_name: code-runner
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./runner:/app
