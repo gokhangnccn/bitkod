@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -46,11 +47,12 @@ public class SubmissionService {
                 return ApiResponse.problemNotFound();
             }
 
-            // Kod derlenip çalıştırılıyor, test case'lerle değerlendirme yapılıyor
-            codeExecutionService.executeAndEvaluateCode(submission, problem);
+            CompletableFuture<Boolean> future = codeExecutionService.executeAndEvaluateCode(submission, problem);
+            Boolean passed = future.get(); // get() ile beklenir
 
-            // Test sonucu ile birlikte veritabanına kaydediyoruz
+            submission.setPassed(passed); // Eğer içeride set edilmiyorsa dışarıda garanti altına alınır
             SubmissionEntity saved = submissionRepository.save(submission);
+
             return ApiResponse.success(saved);
 
         } catch (Exception e) {

@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class CodeExecutionService {
 
     private final TestCaseRepository testCaseRepository;
-    
 
     @Async("codeRunnerExecutor")
     public CompletableFuture<Boolean> executeAndEvaluateCode(SubmissionEntity submission, ProblemEntity problem) {
