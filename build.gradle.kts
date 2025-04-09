@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.gokhan"
-version = "0.1.2"
+version = "0.1.3"
 
 java {
 	toolchain {
@@ -32,6 +32,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
+	// redis
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+	// web socket
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
 
 	// security + jwt
 	implementation("org.springframework.boot:spring-boot-starter-security")
