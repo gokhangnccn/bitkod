@@ -1,9 +1,11 @@
 package com.gokhan.bitcode.service;
 
 import com.gokhan.bitcode.ApiResponse;
+import com.gokhan.bitcode.dtos.FeedbackTask;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
 import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
+import com.gokhan.bitcode.llm.LLMFeedbackQueueProducer;
 import com.gokhan.bitcode.llm.LLMFeedbackService;
 import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.SubmissionRepository;
@@ -12,7 +14,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +29,7 @@ public class SubmissionService {
     private final ProblemRepository problemRepository;
 
     private final LLMFeedbackService llmFeedbackService;
+    private final LLMFeedbackQueueProducer llmFeedbackQueueProducer;
 
 
     @Transactional
@@ -58,12 +60,14 @@ public class SubmissionService {
                 submission.setLlmFeedback("LLM geri bildirimi hazırlanıyor...");
                 SubmissionEntity saved = submissionRepository.save(submission);
 
-                llmFeedbackService.getFeedback(problem.getDescription(), submission.getCode(), submission.getErrorMessage())
-                        .onErrorReturn("LLM geri bildirimi alınamadı.")
-                        .subscribe(feedback -> {
-                            saved.setLlmFeedback(feedback);
-                            submissionRepository.save(saved);
-                        });
+                llmFeedbackQueueProducer.enqueueFeedbackTask(
+                        new FeedbackTask(
+                                saved.getId(),
+                                problem.getDescription(),
+                                submission.getCode(),
+                                submission.getErrorMessage()
+                        )
+                );
 
                 return ApiResponse.success(saved);
             }
