@@ -4,6 +4,7 @@ import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
 import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
+import com.gokhan.bitcode.llm.LLMFeedbackService;
 import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +27,8 @@ public class SubmissionService {
 
     private final ProblemRepository problemRepository;
 
+    private final LLMFeedbackService llmFeedbackService;
+
 
     @Transactional
     public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission, UserClaims userClaims) {
@@ -35,30 +39,44 @@ public class SubmissionService {
         if (alreadySolved) {
             return ApiResponse.badRequest("BIT-3004", "Bu soruyu zaten başarıyla çözdünüz. Tekrar çözemezsiniz.");
         }
+
         try {
             submission.setUserId(Long.valueOf(userClaims.getUserId()));
             submission.setSubmittedAt(LocalDateTime.now());
 
-            // İlgili problemi getiriyoruz
-            ProblemEntity problem = problemRepository.findById(submission.getProblemId())
-                    .orElse(null);
-
+            ProblemEntity problem = problemRepository.findById(submission.getProblemId()).orElse(null);
             if (problem == null) {
                 return ApiResponse.problemNotFound();
             }
 
             CompletableFuture<Boolean> future = codeExecutionService.executeAndEvaluateCode(submission, problem);
-            Boolean passed = future.get(); // get() ile beklenir
+            Boolean passed = future.get(); // Bekle ve sonucu al
+            submission.setPassed(passed);
 
-            submission.setPassed(passed); // Eğer içeride set edilmiyorsa dışarıda garanti altına alınır
+            // başarısızsa LLM'e gönder
+            if (!passed) {
+                submission.setLlmFeedback("LLM geri bildirimi hazırlanıyor...");
+                SubmissionEntity saved = submissionRepository.save(submission);
+
+                llmFeedbackService.getFeedback(problem.getDescription(), submission.getCode(), submission.getErrorMessage())
+                        .onErrorReturn("LLM geri bildirimi alınamadı.")
+                        .subscribe(feedback -> {
+                            saved.setLlmFeedback(feedback);
+                            submissionRepository.save(saved);
+                        });
+
+                return ApiResponse.success(saved);
+            }
+
+
             SubmissionEntity saved = submissionRepository.save(submission);
-
             return ApiResponse.success(saved);
 
         } catch (Exception e) {
             return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu: " + e.getMessage());
         }
     }
+
 
 
     public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserId(Long userId, UserClaims userClaims) {
