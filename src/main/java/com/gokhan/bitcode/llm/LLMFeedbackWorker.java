@@ -25,11 +25,11 @@ public class LLMFeedbackWorker {
     @Scheduled(fixedDelay = 2000)
     public void consume() {
         Long size = redisTemplate.opsForList().size(QUEUE_NAME);
-        log.info("Kuyrukta bekleyen görev sayısı: {}", size);
+        log.info("Kuyrukta bekleyen gorev sayisi: {}", size);
 
         Object obj = redisTemplate.opsForList().leftPop(QUEUE_NAME);
         if (obj instanceof FeedbackTask task) {
-            log.info("Görev alındı. SubmissionId: {}", task.submissionId());
+            log.info("Gorev alindi. SubmissionId: {}", task.submissionId());
 
             llmFeedbackService.getFeedback(task.problemDescription(), task.code(), task.errorMessage())
                     .subscribe(feedback -> {
