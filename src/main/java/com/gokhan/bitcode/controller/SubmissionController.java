@@ -59,5 +59,16 @@ public class SubmissionController {
         ApiResponse<List<SubmissionEntity>> response = submissionService.getSuccessfulSubmissionsByProblemId(problemId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/user/{userId}/solved")
+    public ResponseEntity<ApiResponse<List<Long>>> getSolvedProblems(
+            @PathVariable Long userId,
+            Authentication authentication) {
+
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        ApiResponse<List<Long>> response = submissionService.getSolvedProblemsByUser(userId, userClaims);
+        return ResponseEntity.status(response.getResultCode()).body(response);
+    }
+
 }
 

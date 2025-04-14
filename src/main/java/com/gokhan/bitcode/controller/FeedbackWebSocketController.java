@@ -11,7 +11,10 @@ public class FeedbackWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
 
     public void sendFeedback(Long userId, String feedback) {
-        // kullanıcıya özel bir kanala yayın yap
-        messagingTemplate.convertAndSend("/topic/feedback/" + userId, feedback);
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/topic/feedback",
+                feedback
+        );
     }
 }

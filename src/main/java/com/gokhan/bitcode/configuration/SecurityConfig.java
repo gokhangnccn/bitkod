@@ -35,7 +35,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/problems/**").hasRole("ADMIN")
+                        .requestMatchers("/api/problems/**").permitAll()
+                        .requestMatchers("/api/submissions/**").permitAll()
+                        .requestMatchers("/ws/**", "/topic/**").permitAll()
+                        .requestMatchers("/api/llm-feedback/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
