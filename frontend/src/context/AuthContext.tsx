@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import api from '../api/axios'; // dosya yoluna göre düzenle
+import { api } from '../api/axios';
+
+interface User {
+  id: string;
+  email: string;
+  username: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: any | null;
-  login: (token: string) => void;
+  user: User | null;
+  login: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -13,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -24,19 +29,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUser = async (token: string) => {
     try {
-      const response = await api.get('/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(response.data.Data);
-      setIsAuthenticated(true);
+      const response = await api.get('/auth/me');
+      if (response.data.IsSucceeded) {
+        setUser(response.data.Data);
+        setIsAuthenticated(true);
+      } else {
+        throw new Error(response.data.Message);
+      }
     } catch (error) {
+      console.error('Error fetching user:', error);
       logout();
     }
   };
 
-  const login = (token: string) => {
+  const login = async (token: string) => {
     localStorage.setItem('token', token);
-    fetchUser(token);
+    await fetchUser(token);
   };
 
   const logout = () => {

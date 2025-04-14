@@ -5,8 +5,7 @@ import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, AlertCircle } from 'lucide-react';
-import axios from 'axios';
-import api from '../api/axios';
+import { api } from '../api/axios';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -21,7 +20,11 @@ export function Login() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -29,13 +32,21 @@ export function Login() {
     try {
       setIsLoading(true);
       setError(null);
+
       const response = await api.post('/auth/login', data);
+
       if (response.data.IsSucceeded) {
-        login(response.data.Data.token);
+        await login(response.data.Data.token);
         navigate('/');
+      } else {
+        setError(response.data.Message || 'Login failed');
       }
     } catch (error: any) {
-      setError(error.response?.data?.Message || 'An error occurred during login');
+      setError(
+          error.response?.data?.Message ||
+          error.response?.data?.message ||
+          'An error occurred during login'
+      );
     } finally {
       setIsLoading(false);
     }

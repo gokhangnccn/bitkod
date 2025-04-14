@@ -3,11 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
 import { Play, AlertCircle, CheckCircle, XCircle, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
-import SockJS from 'sockjs-client';
-import { Client, over } from 'stompjs';
-
-let stompClient: Client | null = null;
+import { api } from '../api/axios'; // ✅ singleton api
+import { websocketService } from '../api/websocket.ts'; // ✅ singleton websocket
 
 interface Problem {
   id: number;
@@ -56,58 +53,34 @@ export function ProblemSolve() {
       }
     };
 
-    const connectWebSocket = () => {
-      const token = localStorage.getItem('token');
-      const socket = new SockJS(`http://localhost:8040/ws?token=${token}`);
-      stompClient = over(socket);
-
-      // Debug loglamayı açın
-      stompClient.debug = function(str) {
-        console.log(str);
-      };
-
-      stompClient.connect({}, () => {
-        console.log('WebSocket bağlantısı başarılı!');
-        // Kullanıcı ID'si için doğru yolu kullanın (normalde JWT'den çıkarılmalı)
-        const userId = getUserIdFromToken(token); // getUserIdFromToken fonksiyonunu eklemeniz gerekecek
-
-        console.log(`/user/${userId}/topic/feedback adresine abone olunuyor`);
-        stompClient.subscribe(`/user/${userId}/topic/feedback`, (message) => {
-          console.log('Feedback message received:', message);
-          const feedback = message.body;
-          setIsRequestingFeedback(false);
-          setResult((prev) => ({
-            ...(prev || { passed: false, output: '', errorMessage: '', llmFeedback: '' }),
-            llmFeedback: feedback,
-          }));
-        });
-      }, (error) => {
-        console.error('WebSocket bağlantı hatası:', error);
-      });
-    };
-    const getUserIdFromToken = (token) => {
-      if (!token) return null;
+    const connectWebSocket = async () => {
       try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload).userId || JSON.parse(jsonPayload).sub;
+        const res = await api.get('/auth/me');
+        const userId = res.data?.Data?.userId || res.data?.Data?.id;
+        if (!userId) return;
+
+        websocketService.connect(() => {
+          console.log('WebSocket bağlantısı başarılı!');
+          websocketService.subscribe(`/user/${userId}/topic/feedback`, (message) => {
+            const feedback = typeof message === 'string' ? message : message?.feedback || message.body;
+            console.log('Feedback received:', feedback);
+            setIsRequestingFeedback(false);
+            setResult((prev) => ({
+              ...(prev || { passed: false, output: '', errorMessage: '', llmFeedback: '' }),
+              llmFeedback: feedback,
+            }));
+          });
+        });
       } catch (e) {
-        console.error('Token çözme hatası:', e);
-        return null;
+        console.error('WebSocket bağlantısı sırasında kullanıcı bilgisi alınamadı:', e);
       }
     };
+
     fetchProblem();
     connectWebSocket();
 
     return () => {
-      if (stompClient && stompClient.connected) {
-        stompClient.disconnect(() => {
-          console.log('WebSocket bağlantısı kapatıldı.');
-        });
-      }
+      websocketService.disconnect();
     };
   }, [id, isAuthenticated, navigate]);
 
@@ -117,20 +90,11 @@ export function ProblemSolve() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.post(
-          '/submissions',
-          {
-            problemId: problem.id,
-            code,
-            language: 'JAVA',
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-      );
+      const response = await api.post('/submissions', {
+        problemId: problem.id,
+        code,
+        language: 'JAVA',
+      });
 
       if (response.data.IsSucceeded) {
         setResult(response.data.Data);
