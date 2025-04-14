@@ -1,5 +1,6 @@
 package com.gokhan.bitcode.llm;
 
+import com.gokhan.bitcode.controller.FeedbackWebSocketController;
 import com.gokhan.bitcode.dtos.LLMResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,9 @@ public class LLMFeedbackService {
 
     private final WebClient.Builder webClientBuilder;
 
-    public Mono<String> getFeedback(String problemDescription, String code, String errorMessage) {
+    private final FeedbackWebSocketController feedbackWebSocketController;
+
+    public Mono<String> getFeedback(String problemDescription, String code, String errorMessage, Long userId) {
         String prompt = """
                 Problem Tanımı:
                 %s
@@ -46,18 +49,20 @@ public class LLMFeedbackService {
                         "max_tokens", 200,
                         "temperature", 0.3,
                         "messages", new Object[]{
-                                Map.of("role", "system", "content", "Sen deneyimli bir Java eğitmenisin." +
-                                        "Kullanıcıya kodun nasıl çözüldüğünü değil, nerede hata yaptığını kısaca ipucu olarak ver."),
+                                Map.of("role", "system", "content", "Sen deneyimli bir Java eğitmenisin. Kullanıcıya kodun nasıl çözüldüğünü değil, nerede hata yaptığını kısaca ipucu olarak ver."),
                                 Map.of("role", "user", "content", prompt)
                         }
                 ))
                 .retrieve()
                 .bodyToMono(LLMResponse.class)
                 .map(response -> {
+                    String feedback = "Geri bildirim alınamadı.";
                     if (response.getChoices() != null && !response.getChoices().isEmpty()) {
-                        return response.getChoices().get(0).getMessage().getContent();
+                        feedback = response.getChoices().get(0).getMessage().getContent();
                     }
-                    return "Geri bildirim alınamadı.";
+                    feedbackWebSocketController.sendFeedback(userId, feedback);
+                    System.out.println("WebSocket mesajı gönderiliyor: " + feedback); //SİL SONRA
+                    return feedback;
                 });
     }
 }

@@ -28,10 +28,6 @@ public class SubmissionService {
 
     private final ProblemRepository problemRepository;
 
-    private final LLMFeedbackService llmFeedbackService;
-    private final LLMFeedbackQueueProducer llmFeedbackQueueProducer;
-
-
     @Transactional
     public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission, UserClaims userClaims) {
         boolean alreadySolved = submissionRepository.existsByUserIdAndProblemIdAndPassedTrue(
@@ -52,30 +48,10 @@ public class SubmissionService {
             }
 
             CompletableFuture<Boolean> future = codeExecutionService.executeAndEvaluateCode(submission, problem);
-            Boolean passed = future.get(); // Bekle ve sonucu al
+            Boolean passed = future.get();
             submission.setPassed(passed);
-
-            // başarısızsa LLM'e gönder
-            if (!passed) {
-                submission.setLlmFeedback("LLM geri bildirimi hazırlanıyor...");
-                SubmissionEntity saved = submissionRepository.save(submission);
-
-                llmFeedbackQueueProducer.enqueueFeedbackTask(
-                        new FeedbackTask(
-                                saved.getId(),
-                                problem.getDescription(),
-                                submission.getCode(),
-                                submission.getErrorMessage()
-                        )
-                );
-
-                return ApiResponse.success(saved);
-            }
-
-
             SubmissionEntity saved = submissionRepository.save(submission);
             return ApiResponse.success(saved);
-
         } catch (Exception e) {
             return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu: " + e.getMessage());
         }

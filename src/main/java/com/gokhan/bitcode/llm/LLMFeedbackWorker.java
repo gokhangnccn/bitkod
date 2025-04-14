@@ -31,23 +31,31 @@ public class LLMFeedbackWorker {
         if (obj instanceof FeedbackTask task) {
             log.info("Gorev alindi. SubmissionId: {}", task.submissionId());
 
-            llmFeedbackService.getFeedback(task.problemDescription(), task.code(), task.errorMessage())
-                    .subscribe(feedback -> {
-                        submissionRepository.findById(task.submissionId()).ifPresentOrElse(submission -> {
-                            submission.setLlmFeedback(feedback);
-                            submissionRepository.save(submission);
-                            log.info("Feedback kaydedildi. SubmissionId: {}", submission.getId());
+            submissionRepository.findById(task.submissionId()).ifPresentOrElse(submission -> {
+                llmFeedbackService.getFeedback(
+                        task.problemDescription(),
+                        task.code(),
+                        task.errorMessage(),
+                        submission.getUserId()
+                ).subscribe(feedback -> {
+                    submission.setLlmFeedback(feedback);
+                    submissionRepository.save(submission);
+                    log.info("Feedback kaydedildi. SubmissionId: {}", submission.getId());
 
-                            // WebSocket mesajı gönder
-                            messagingTemplate.convertAndSend(
-                                    "/topic/feedback/" + submission.getUserId(), feedback
-                            );
-                        }, () -> {
-                            log.warn("Submission bulunamadı. ID: {}", task.submissionId());
-                        });
-                    }, error -> {
-                        log.error("Feedback alınamadı: {}", error.getMessage());
-                    });
+                    // Doğrudan SimpMessagingTemplate kullanarak mesaj gönderiyoruz
+                    String destination = "/user/" + submission.getUserId() + "/topic/feedback";
+                    log.info("WebSocket message sending to: {}", destination);
+                    messagingTemplate.convertAndSendToUser(
+                            submission.getUserId().toString(),
+                            "/topic/feedback",
+                            feedback
+                    );
+                }, error -> {
+                    log.error("Feedback alinamadi: {}", error.getMessage());
+                });
+            }, () -> {
+                log.warn("Submission bulunamadi. ID: {}", task.submissionId());
+            });
         }
     }
 }
