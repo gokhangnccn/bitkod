@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
-import api from '../api/axios';
+import { api } from '../api/axios'; // Singleton instance
 import AdvancedModal from '../components/AdvancedModal';
 
 interface Problem {
@@ -14,67 +14,50 @@ interface Problem {
 
 export function Problems() {
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [solvedProblems, setSolvedProblems] = useState<{ [problemId: number]: string }>({});
+  const [solvedProblems, setSolvedProblems] = useState<Record<number, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-
   useEffect(() => {
-    const fetchProblems = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const response = await api.get('/problems');
-        if (response.data.IsSucceeded) {
-          setProblems(response.data.Data);
-        } else {
-          setError('Failed to fetch problems');
-        }
-      } catch (err: any) {
-        setError(err.response?.data?.Message || 'An error occurred while fetching problems');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        // Problemler ve kullanıcı bilgileri paralel alınır
+        const [problemsRes, userRes] = await Promise.all([
+          api.get('/problems'),
+          api.get('/auth/me'), // endpointin doğru olduğuna emin ol
+        ]);
 
-    const fetchSolvedDetails = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const userId = getUserIdFromToken(token);
-        const response = await api.get(`/submissions/user/${userId}`);
-        if (response.data.IsSucceeded) {
-          const solvedMap: { [problemId: number]: string } = {};
-          response.data.Data.forEach((s: any) => {
+        if (!problemsRes.data.IsSucceeded || !userRes.data.IsSucceeded) {
+          setError('Veriler alınırken hata oluştu');
+          return;
+        }
+
+        const userId = userRes.data.Data.userId;
+        setProblems(problemsRes.data.Data);
+
+        // Kullanıcının çözdüğü problemler alınır
+        const solvedRes = await api.get(`/submissions/user/${userId}`);
+        if (solvedRes.data.IsSucceeded) {
+          const solvedMap: Record<number, string> = {};
+          solvedRes.data.Data.forEach((s: any) => {
             if (s.passed && !solvedMap[s.problemId]) {
               solvedMap[s.problemId] = s.submittedAt;
             }
           });
           setSolvedProblems(solvedMap);
         }
-      } catch (e) {
-        console.error('Solved problems fetch failed', e);
+
+      } catch (err: any) {
+        setError(err.response?.data?.Message || 'Veriler alınırken hata oluştu');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    const getUserIdFromToken = (token: string | null) => {
-      if (!token) return null;
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload).userId || JSON.parse(jsonPayload).sub;
-      } catch (e) {
-        return null;
-      }
-    };
-
-    fetchProblems();
-    fetchSolvedDetails();
+    fetchData();
   }, []);
 
   const getDifficultyColor = (difficulty: string) => {
@@ -93,11 +76,11 @@ export function Problems() {
   const handleProblemClick = (e: React.MouseEvent, problemId: number) => {
     if (solvedProblems[problemId]) {
       e.preventDefault();
-      setModalMessage(`Bu problemi ${new Date(solvedProblems[problemId]).toLocaleDateString()} tarihinde başarıyla çözdünüz. Yeniden açamazsınız.`);
+      const solvedDate = new Date(solvedProblems[problemId]).toLocaleDateString('tr-TR');
+      setModalMessage(`Bu problemi ${solvedDate} tarihinde başarıyla çözdünüz. Yeniden açamazsınız.`);
       setShowModal(true);
     }
   };
-
 
   if (isLoading) {
     return (
@@ -120,17 +103,16 @@ export function Problems() {
     );
   }
 
-
   return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <BookOpen className="h-8 w-8 mr-3 text-indigo-600"/>
+              <BookOpen className="h-8 w-8 mr-3 text-indigo-600" />
               Problemler
               <span className="ml-4 text-sm text-gray-500 font-normal">
               ({Object.keys(solvedProblems).length}/{problems.length} solved)
-              </span>
+            </span>
             </h1>
           </div>
 
@@ -149,16 +131,17 @@ export function Problems() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                            {problem.title}{' '}
+                            {problem.title}
                             {solvedProblems[problem.id] && (
-                                <CheckCircle className="inline-block h-5 w-5 text-green-500 ml-2"/>
+                                <CheckCircle className="inline-block h-5 w-5 text-green-500 ml-2" />
                             )}
                           </h2>
                           <p className="text-gray-600 line-clamp-2">{problem.description}</p>
                         </div>
                         <div className="ml-6">
                       <span
-                          className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}>
+                          className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}
+                      >
                         {problem.difficulty}
                       </span>
                         </div>
@@ -184,12 +167,12 @@ export function Problems() {
               </div>
           )}
         </div>
+
         <AdvancedModal
-          show={showModal}
+            show={showModal}
             onClose={() => setShowModal(false)}
             message={modalMessage}
         />
       </div>
-
   );
 }
