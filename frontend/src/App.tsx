@@ -7,6 +7,8 @@ import { Register } from './pages/Register';
 import { Problems } from './pages/Problems';
 import { ProblemSolve } from './pages/ProblemSolve';
 import { AuthProvider } from './context/AuthContext';
+import Account from "./pages/Account.tsx";
+import Leaderboard from "./pages/LeaderBoard.tsx";
 
 function App() {
     return (
@@ -17,6 +19,8 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/account" element={<Account />} />
+                        <Route path="/leaderboard" element={<Leaderboard />} />
                         <Route path="/problems" element={<Problems />} />
                         <Route path="/problems/:id" element={<ProblemSolve />} />
                     </Routes>
