@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
 import { Play, AlertCircle, CheckCircle, XCircle, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api/axios'; // ✅ singleton api
-import { websocketService } from '../api/websocket.ts'; // ✅ singleton websocket
+import { api } from '../api/axios';
+import { websocketService } from '../api/websocket.ts';
 
 interface Problem {
   id: number;

@@ -1,6 +1,7 @@
 package com.gokhan.bitcode.controller;
 
 import com.gokhan.bitcode.ApiResponse;
+import com.gokhan.bitcode.dtos.UserProfileDTO;
 import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.service.UserService;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -27,8 +28,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserEntity>> getUserById(@PathVariable Long id,
-                                                               Authentication authentication) {
+    public ResponseEntity<ApiResponse<UserProfileDTO>> getUserById(@PathVariable Long id,
+                                                                   Authentication authentication) {
         UserClaims userClaims = (UserClaims) authentication.getPrincipal();
         return ResponseEntity.ok(userService.getUserById(id, userClaims));
     }

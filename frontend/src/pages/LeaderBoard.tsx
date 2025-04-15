@@ -1,0 +1,103 @@
+import React, { useEffect, useState } from 'react';
+import { api } from '../api/axios';
+import { BarChart3, User, BookOpen, Percent, BarChart2 } from 'lucide-react';
+import AdvancedModal from '../components/AdvancedModal';
+
+interface UserStats {
+    userId: number;
+    username: string;
+    solvedProblemsCount: number;
+    successRate: number;
+    totalSubmissions: number;
+}
+
+export default function Leaderboard() {
+    const [stats, setStats] = useState<UserStats[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showModal, setShowModal] = useState(false);
+
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            try {
+                const res = await api.get('/leaderboard');
+                if (!res.data.IsSucceeded) throw new Error('Leaderboard yüklenemedi');
+                setStats(res.data.Data.slice(0, 10));
+            } catch (err: any) {
+                setError(err.response?.data?.Message || err.message || 'Leaderboard yüklenemedi');
+                setShowModal(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLeaderboard();
+    }, []);
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-md">
+                <div className="flex items-center mb-8">
+                    <BarChart3 className="h-8 w-8 text-indigo-600 mr-3" />
+                    <h1 className="text-3xl font-bold text-gray-800">Liderlik Tablosu</h1>
+                </div>
+
+                {loading ? (
+                    <div className="text-center text-gray-600 py-8">Yükleniyor...</div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full table-auto text-sm text-left text-gray-700">
+                            <thead className="bg-gray-100 text-gray-500 uppercase text-xs">
+                            <tr>
+                                <th className="px-6 py-3">Sıra</th>
+                                <th className="px-6 py-3">Kullanıcı Adı</th>
+                                <th className="px-6 py-3">Çözülen</th>
+                                <th className="px-6 py-3">Başarı Oranı</th>
+                                <th className="px-6 py-3">Toplam Gönderim</th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-100">
+                            {stats.map((user, index) => (
+                                <tr key={user.userId} className="hover:bg-gray-50 transition">
+                                    <td className="px-6 py-4 text-indigo-600 font-semibold">#{index + 1}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-gray-800">
+                                            <User className="h-4 w-4 text-indigo-500"/>
+                                            {user.username}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-gray-800">
+                                            <BookOpen className="h-4 w-4 text-blue-500"/>
+                                            {user.solvedProblemsCount}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-gray-800">
+                                            <Percent className="h-4 w-4 text-green-500"/>
+                                            %{user.successRate.toFixed(2)}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-gray-800">
+                                            <BarChart2 className="h-4 w-4 text-yellow-500"/>
+                                            {user.totalSubmissions}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+
+                        </table>
+                    </div>
+                )}
+
+                <AdvancedModal
+                    show={showModal}
+                    onClose={() => setShowModal(false)}
+                    message={error || 'Bilinmeyen bir hata oluştu'}
+                />
+            </div>
+        </div>
+    );
+}

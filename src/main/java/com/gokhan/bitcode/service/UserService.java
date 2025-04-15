@@ -1,6 +1,7 @@
 package com.gokhan.bitcode.service;
 
 import com.gokhan.bitcode.ApiResponse;
+import com.gokhan.bitcode.dtos.UserProfileDTO;
 import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.repository.UserRepository;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -24,7 +25,7 @@ public class UserService {
         return ApiResponse.success(userRepository.findAll());
     }
 
-    public ApiResponse<UserEntity> getUserById(Long id, UserClaims userClaims) {
+    public ApiResponse<UserProfileDTO> getUserById(Long id, UserClaims userClaims) {
         boolean isAdmin = "ADMIN".equalsIgnoreCase(userClaims.getRole());
         boolean isOwner = userClaims.getUserId().equals(String.valueOf(id));
 
@@ -33,9 +34,17 @@ public class UserService {
         }
 
         return userRepository.findById(id)
-                .map(ApiResponse::success)
+                .map(user -> ApiResponse.success(
+                        new UserProfileDTO(
+                                user.getId(),
+                                user.getUsername(),
+                                user.getEmail(),
+                                user.getCreatedAt()
+                        )
+                ))
                 .orElse(ApiResponse.userNotFound());
     }
+
 
 
     public ApiResponse<Void> deleteUserById(Long id, UserClaims userClaims) {
