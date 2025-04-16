@@ -28,7 +28,8 @@ export function ProblemSolve() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [problem, setProblem] = useState<Problem | null>(null);
-  const [code, setCode] = useState('// Write your Java solution here\n');
+  const [code, setCode] = useState('');
+  const [language, setLanguage] = useState<'JAVA' | 'PYTHON'>('JAVA');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRequestingFeedback, setIsRequestingFeedback] = useState(false);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
@@ -60,10 +61,8 @@ export function ProblemSolve() {
         if (!userId) return;
 
         websocketService.connect(() => {
-          console.log('WebSocket bağlantısı başarılı!');
           websocketService.subscribe(`/user/${userId}/topic/feedback`, (message) => {
             const feedback = typeof message === 'string' ? message : message?.feedback || message.body;
-            console.log('Feedback received:', feedback);
             setIsRequestingFeedback(false);
             setResult((prev) => ({
               ...(prev || { passed: false, output: '', errorMessage: '', llmFeedback: '' }),
@@ -84,6 +83,17 @@ export function ProblemSolve() {
     };
   }, [id, isAuthenticated, navigate]);
 
+  useEffect(() => {
+    setCode(
+        language === 'JAVA'
+            ? `\npublic static void main(String[] args) throws Exception {
+  // Kodunuzu buraya yazın
+ 
+}`
+            : '# Write your Python solution here\n'
+    );
+  }, [language]);
+
   const handleSubmit = async () => {
     if (!problem) return;
     setIsSubmitting(true);
@@ -93,7 +103,7 @@ export function ProblemSolve() {
       const response = await api.post('/submissions', {
         problemId: problem.id,
         code,
-        language: 'JAVA',
+        language,
       });
 
       if (response.data.IsSucceeded) {
@@ -145,56 +155,72 @@ export function ProblemSolve() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Problem Info */}
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">{problem.title}</h1>
-                <div className="prose max-w-none">
-                  <h2 className="text-lg font-semibold text-gray-900">Problem Description</h2>
-                  <p className="text-gray-600 whitespace-pre-wrap">{problem.description}</p>
-                </div>
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <h1 className="text-3xl font-extrabold text-gray-900 mb-6">{problem.title}</h1>
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">Problem Açıklaması</h2>
+                <p className="text-gray-600 whitespace-pre-wrap">{problem.description}</p>
               </div>
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Examples</h2>
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">Örnek</h2>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Input:</h3>
+                    <h3 className="text-sm font-medium text-gray-700">Örnek Giriş:</h3>
                     <pre className="mt-1 bg-gray-50 rounded p-3 text-sm text-gray-800">{problem.exampleInput}</pre>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Output:</h3>
+                    <h3 className="text-sm font-medium text-gray-700">Örnek Çıktı:</h3>
                     <pre className="mt-1 bg-gray-50 rounded p-3 text-sm text-gray-800">{problem.exampleOutput}</pre>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Solution Panel */}
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Solution</h2>
-                  <button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {isSubmitting ? 'Running...' : 'Run Code'}
-                  </button>
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Çözümünüz</h2>
+                  <div className="flex items-center gap-3">
+                    <select
+                        className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value as 'JAVA' | 'PYTHON')}
+                    >
+                      <option value="JAVA">Java</option>
+                      <option value="PYTHON">Python</option>
+                    </select>
+
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {isSubmitting ? 'Çalıştırılıyor...' : 'Kodu Çalıştır'}
+                    </button>
+                  </div>
                 </div>
-                <div className="h-[400px] border rounded-lg overflow-hidden">
-                  <Editor
-                      height="100%"
-                      defaultLanguage="java"
-                      theme="vs-dark"
-                      value={code}
-                      onChange={(value) => setCode(value || '')}
-                      options={{ minimap: { enabled: false }, fontSize: 14, lineNumbers: 'on', automaticLayout: true }}
-                  />
-                </div>
+
+                <Editor
+                    height="400px"
+                    language={language === 'JAVA' ? 'java' : 'python'}
+                    theme="vs-dark"
+                    value={code}
+                    onChange={(value) => setCode(value || '')}
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      lineNumbers: 'on',
+                      automaticLayout: true,
+                    }}
+                />
               </div>
 
+              {/* Results */}
               {result && (
-                  <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                     <div className="flex items-center mb-4">
                       {result.passed ? (
                           <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
@@ -202,20 +228,20 @@ export function ProblemSolve() {
                           <XCircle className="h-6 w-6 text-red-500 mr-2" />
                       )}
                       <h2 className="text-lg font-semibold text-gray-900">
-                        {result.passed ? 'Success!' : 'Test Cases Failed'}
+                        {result.passed ? 'Tüm testler başarıyla geçti!' : 'Bazı testler başarısız oldu'}
                       </h2>
                     </div>
 
                     {result.output && (
                         <div className="mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 mb-2">Output:</h3>
+                          <h3 className="text-sm font-medium text-gray-700 mb-2">Çıktı:</h3>
                           <pre className="bg-gray-50 rounded p-3 text-sm text-gray-800 whitespace-pre-wrap">{result.output}</pre>
                         </div>
                     )}
 
                     {result.errorMessage && (
                         <div className="mb-4">
-                          <h3 className="text-sm font-medium text-red-700 mb-2">Error:</h3>
+                          <h3 className="text-sm font-medium text-red-700 mb-2">Hata:</h3>
                           <pre className="bg-red-50 rounded p-3 text-sm text-red-800 whitespace-pre-wrap">{result.errorMessage}</pre>
                         </div>
                     )}
@@ -232,8 +258,8 @@ export function ProblemSolve() {
                     )}
 
                     {result.llmFeedback && (
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-700 mb-2">AI Feedback:</h3>
+                        <div className="mt-4">
+                          <h3 className="text-sm font-medium text-gray-700 mb-2">Yapay Zeka Geri Bildirimi:</h3>
                           <div className="bg-blue-50 rounded p-3 text-sm text-blue-800 flex items-center gap-2">
                             {result.llmFeedback === 'LLM geri bildirimi hazırlanıyor...' && (
                                 <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800" />
