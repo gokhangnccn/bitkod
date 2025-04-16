@@ -85,9 +85,7 @@ public class CodeExecutionService {
                 import java.util.*;
 
                 public class %s {
-                    public static void main(String[] args) throws Exception {
                         %s
-                    }
                 }
                 """.formatted(className, code);
     }
