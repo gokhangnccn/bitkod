@@ -121,7 +121,7 @@ export function Problems() {
               {problems.map((problem) => (
                   <li
                       key={problem.id}
-                      className={`transition-colors duration-150 ${solvedProblems[problem.id] ? 'opacity-70 bg-emerald-100' : 'hover:bg-gray-50'}`}
+                      className={`transition-colors duration-150 ${solvedProblems[problem.id] ? 'opacity-70 bg-green-100' : 'hover:bg-gray-50'}`}
                   >
                     <Link
                         to={`/problems/${problem.id}`}
