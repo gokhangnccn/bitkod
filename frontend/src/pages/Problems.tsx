@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
-import { api } from '../api/axios'; // Singleton instance
+import { api } from '../api/axios';
 import AdvancedModal from '../components/AdvancedModal';
 
 interface Problem {
@@ -24,10 +24,9 @@ export function Problems() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Problemler ve kullanıcı bilgileri paralel alınır
         const [problemsRes, userRes] = await Promise.all([
           api.get('/problems'),
-          api.get('/auth/me'), // endpointin doğru olduğuna emin ol
+          api.get('/auth/me'),
         ]);
 
         if (!problemsRes.data.IsSucceeded || !userRes.data.IsSucceeded) {
@@ -38,7 +37,6 @@ export function Problems() {
         const userId = userRes.data.Data.userId;
         setProblems(problemsRes.data.Data);
 
-        // Kullanıcının çözdüğü problemler alınır
         const solvedRes = await api.get(`/submissions/user/${userId}`);
         if (solvedRes.data.IsSucceeded) {
           const solvedMap: Record<number, string> = {};
@@ -49,7 +47,6 @@ export function Problems() {
           });
           setSolvedProblems(solvedMap);
         }
-
       } catch (err: any) {
         setError(err.response?.data?.Message || 'Veriler alınırken hata oluştu');
       } finally {
@@ -63,13 +60,13 @@ export function Problems() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'EASY':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400';
       case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300';
       case 'HARD':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
@@ -84,7 +81,7 @@ export function Problems() {
 
   if (isLoading) {
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
     );
@@ -92,9 +89,9 @@ export function Problems() {
 
   if (error) {
     return (
-        <div className="min-h-screen bg-gray-50 p-4">
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center text-red-700">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md p-4 flex items-center text-red-700 dark:text-red-300">
               <AlertCircle className="h-5 w-5 mr-3" />
               <span>{error}</span>
             </div>
@@ -104,24 +101,28 @@ export function Problems() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               <BookOpen className="h-8 w-8 mr-3 text-indigo-600" />
               Problemler
-              <span className="ml-4 text-sm text-gray-500 font-normal">
-              ({Object.keys(solvedProblems).length}/{problems.length} solved)
+              <span className="ml-4 text-sm text-gray-500 dark:text-gray-400 font-normal">
+              ({Object.keys(solvedProblems).length}/{problems.length} çözüldü)
             </span>
             </h1>
           </div>
 
-          <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-            <ul className="divide-y divide-gray-200">
+          <div className="bg-white dark:bg-zinc-800 shadow-sm rounded-lg overflow-hidden border border-gray-100 dark:border-zinc-700">
+            <ul className="divide-y divide-gray-200 dark:divide-zinc-700">
               {problems.map((problem) => (
                   <li
                       key={problem.id}
-                      className={`transition-colors duration-150 ${solvedProblems[problem.id] ? 'opacity-70 bg-green-100' : 'hover:bg-gray-50'}`}
+                      className={`transition-all duration-150 ${
+                          solvedProblems[problem.id]
+                              ? 'opacity-70 bg-green-50 dark:bg-green-900/10'
+                              : 'hover:bg-gray-50 dark:hover:bg-zinc-700'
+                      }`}
                   >
                     <Link
                         to={`/problems/${problem.id}`}
@@ -130,27 +131,31 @@ export function Problems() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             {problem.title}
                             {solvedProblems[problem.id] && (
                                 <CheckCircle className="inline-block h-5 w-5 text-green-500 ml-2" />
                             )}
                           </h2>
-                          <p className="text-gray-600 line-clamp-2">{problem.description}</p>
+                          <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
+                            {problem.description}
+                          </p>
                         </div>
                         <div className="ml-6">
                       <span
-                          className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}
+                          className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(
+                              problem.difficulty
+                          )}`}
                       >
                         {problem.difficulty}
                       </span>
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center text-sm text-gray-500">
-                        <span>Created: {new Date(problem.createdAt).toLocaleDateString()}</span>
+                      <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span>Oluşturulma: {new Date(problem.createdAt).toLocaleDateString()}</span>
                         {solvedProblems[problem.id] && (
-                            <span className="ml-6 text-green-600">
-                        Solved on: {new Date(solvedProblems[problem.id]).toLocaleDateString()}
+                            <span className="ml-6 text-green-600 dark:text-green-400">
+                        Çözüm tarihi: {new Date(solvedProblems[problem.id]).toLocaleDateString()}
                       </span>
                         )}
                       </div>
@@ -162,8 +167,8 @@ export function Problems() {
 
           {problems.length === 0 && (
               <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900">No problems found</h3>
-                <p className="mt-2 text-gray-500">Check back later for new challenges.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Problem bulunamadı</h3>
+                <p className="mt-2 text-gray-500 dark:text-gray-400">Yeni sorular için tekrar kontrol edin.</p>
               </div>
           )}
         </div>

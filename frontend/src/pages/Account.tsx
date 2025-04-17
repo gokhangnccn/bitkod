@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/axios';
-import { User, BarChart2, CheckCircle2, BookOpen, Percent } from 'lucide-react';
+import {
+    User,
+    BarChart2,
+    CheckCircle2,
+    BookOpen,
+    Percent,
+} from 'lucide-react';
 import AdvancedModal from '../components/AdvancedModal';
 
 interface SubmissionStats {
@@ -66,28 +72,28 @@ const AccountPage = () => {
         value: string | number;
         color: string;
     }) => (
-        <div className={`bg-white p-4 rounded-xl shadow border-l-4 ${color}`}>
+        <div className={`bg-white dark:bg-zinc-800 p-4 rounded-xl shadow border-l-4 ${color}`}>
             <div className="flex items-center gap-3">
-                <Icon className="h-6 w-6 text-gray-600" />
+                <Icon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                 <div>
-                    <p className="text-sm text-gray-500">{label}</p>
-                    <p className="text-xl font-semibold text-gray-900">{value}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+                    <p className="text-xl font-semibold text-gray-900 dark:text-white">{value}</p>
                 </div>
             </div>
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800 transition-colors duration-300 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-zinc-700">
                 <div className="flex items-center mb-8">
                     <User className="h-10 w-10 text-indigo-600 mr-4" />
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             Merhaba{profile?.username ? `, ${profile.username}` : ''}
                         </h1>
                         {profile && (
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 Katılım tarihi: {new Date(profile.createdAt).toLocaleDateString('tr-TR')}
                             </p>
                         )}
@@ -97,19 +103,19 @@ const AccountPage = () => {
                 {profile && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Kullanıcı Adı</p>
-                            <p className="text-lg font-semibold text-gray-800">{profile.username}</p>
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Kullanıcı Adı</p>
+                            <p className="text-lg font-semibold text-gray-800 dark:text-white">{profile.username}</p>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-500">E-posta</p>
-                            <p className="text-lg font-semibold text-gray-800">{profile.email}</p>
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">E-posta</p>
+                            <p className="text-lg font-semibold text-gray-800 dark:text-white">{profile.email}</p>
                         </div>
                     </div>
                 )}
 
                 {stats && (
                     <>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">İstatistikler</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">İstatistikler</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <StatCard
                                 icon={BarChart2}

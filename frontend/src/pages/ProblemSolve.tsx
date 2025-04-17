@@ -47,10 +47,10 @@ export function ProblemSolve() {
         if (response.data.IsSucceeded) {
           setProblem(response.data.Data);
         } else {
-          setError('Failed to fetch problem details');
+          setError('Soru bilgisi alınamadı');
         }
       } catch (err: any) {
-        setError(err.response?.data?.Message || 'An error occurred while fetching the problem');
+        setError(err.response?.data?.Message || 'Soru bilgisi alınırken hata oluştu');
       }
     };
 
@@ -71,7 +71,7 @@ export function ProblemSolve() {
           });
         });
       } catch (e) {
-        console.error('WebSocket bağlantısı sırasında kullanıcı bilgisi alınamadı:', e);
+        console.error('WebSocket bağlantı hatası:', e);
       }
     };
 
@@ -112,7 +112,7 @@ export function ProblemSolve() {
         setError(response.data.Message);
       }
     } catch (err: any) {
-      setError(err.response?.data?.Message || 'An error occurred during submission');
+      setError(err.response?.data?.Message || 'Gönderim sırasında bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
@@ -132,12 +132,10 @@ export function ProblemSolve() {
 
   if (error) {
     return (
-        <div className="min-h-screen bg-gray-50 p-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center text-red-700">
-              <AlertCircle className="h-5 w-5 mr-3" />
-              <span>{error}</span>
-            </div>
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center px-4">
+          <div className="bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 p-4 rounded-md flex items-center gap-3">
+            <AlertCircle className="h-5 w-5" />
+            <span>{error}</span>
           </div>
         </div>
     );
@@ -145,132 +143,130 @@ export function ProblemSolve() {
 
   if (!problem) {
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
     );
   }
 
   return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Problem Info */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <h1 className="text-3xl font-extrabold text-gray-900 mb-6">{problem.title}</h1>
-                <h2 className="text-xl font-semibold text-gray-800 mb-3">Problem Açıklaması</h2>
-                <p className="text-gray-600 whitespace-pre-wrap">{problem.description}</p>
-              </div>
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <h2 className="text-xl font-semibold text-gray-800 mb-3">Örnek</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700">Örnek Giriş:</h3>
-                    <pre className="mt-1 bg-gray-50 rounded p-3 text-sm text-gray-800">{problem.exampleInput}</pre>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700">Örnek Çıktı:</h3>
-                    <pre className="mt-1 bg-gray-50 rounded p-3 text-sm text-gray-800">{problem.exampleOutput}</pre>
-                  </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Problem Info */}
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-md p-6">
+              <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6">{problem.title}</h1>
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Problem Açıklaması</h2>
+              <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{problem.description}</p>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Örnek</h2>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Örnek Giriş:</h3>
+                  <pre className="mt-1 bg-gray-50 dark:bg-zinc-900 rounded p-3 text-sm text-gray-800 dark:text-gray-200">{problem.exampleInput}</pre>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Örnek Çıktı:</h3>
+                  <pre className="mt-1 bg-gray-50 dark:bg-zinc-900 rounded p-3 text-sm text-gray-800 dark:text-gray-200">{problem.exampleOutput}</pre>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Solution Panel */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Çözümünüz</h2>
-                  <div className="flex items-center gap-3">
-                    <select
-                        className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value as 'JAVA' | 'PYTHON')}
-                    >
-                      <option value="JAVA">Java</option>
-                      <option value="PYTHON">Python</option>
-                    </select>
+          {/* Solution Panel */}
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-md p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Çözümünüz</h2>
+                <div className="flex items-center gap-3">
+                  <select
+                      className="border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-sm rounded-md px-3 py-1.5 text-gray-800 dark:text-white"
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value as 'JAVA' | 'PYTHON')}
+                  >
+                    <option value="JAVA">Java</option>
+                    <option value="PYTHON">Python</option>
+                  </select>
 
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {isSubmitting ? 'Çalıştırılıyor...' : 'Kodu Çalıştır'}
-                    </button>
-                  </div>
+                  <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {isSubmitting ? 'Çalıştırılıyor...' : 'Kodu Çalıştır'}
+                  </button>
                 </div>
-
-                <Editor
-                    height="400px"
-                    language={language === 'JAVA' ? 'java' : 'python'}
-                    theme="vs-dark"
-                    value={code}
-                    onChange={(value) => setCode(value || '')}
-                    options={{
-                      minimap: { enabled: false },
-                      fontSize: 14,
-                      lineNumbers: 'on',
-                      automaticLayout: true,
-                    }}
-                />
               </div>
 
-              {/* Results */}
-              {result && (
-                  <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                    <div className="flex items-center mb-4">
-                      {result.passed ? (
-                          <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
-                      ) : (
-                          <XCircle className="h-6 w-6 text-red-500 mr-2" />
-                      )}
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {result.passed ? 'Tüm testler başarıyla geçti!' : 'Bazı testler başarısız oldu'}
-                      </h2>
-                    </div>
-
-                    {result.output && (
-                        <div className="mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 mb-2">Çıktı:</h3>
-                          <pre className="bg-gray-50 rounded p-3 text-sm text-gray-800 whitespace-pre-wrap">{result.output}</pre>
-                        </div>
-                    )}
-
-                    {result.errorMessage && (
-                        <div className="mb-4">
-                          <h3 className="text-sm font-medium text-red-700 mb-2">Hata:</h3>
-                          <pre className="bg-red-50 rounded p-3 text-sm text-red-800 whitespace-pre-wrap">{result.errorMessage}</pre>
-                        </div>
-                    )}
-
-                    {!result.passed && !result.llmFeedback && (
-                        <button
-                            onClick={requestLLMFeedback}
-                            disabled={isRequestingFeedback}
-                            className="mt-4 flex items-center gap-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded shadow"
-                        >
-                          <Bot className="w-4 h-4" />
-                          {isRequestingFeedback ? 'Gönderiliyor...' : 'LLM Feedback Al'}
-                        </button>
-                    )}
-
-                    {result.llmFeedback && (
-                        <div className="mt-4">
-                          <h3 className="text-sm font-medium text-gray-700 mb-2">Yapay Zeka Geri Bildirimi:</h3>
-                          <div className="bg-blue-50 rounded p-3 text-sm text-blue-800 flex items-center gap-2">
-                            {result.llmFeedback === 'LLM geri bildirimi hazırlanıyor...' && (
-                                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800" />
-                            )}
-                            <span>{result.llmFeedback}</span>
-                          </div>
-                        </div>
-                    )}
-                  </div>
-              )}
+              <Editor
+                  height="400px"
+                  language={language === 'JAVA' ? 'java' : 'python'}
+                  theme="vs-dark"
+                  value={code}
+                  onChange={(value) => setCode(value || '')}
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    automaticLayout: true,
+                  }}
+              />
             </div>
+
+            {/* Results */}
+            {result && (
+                <div className="bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-md p-6">
+                  <div className="flex items-center mb-4">
+                    {result.passed ? (
+                        <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
+                    ) : (
+                        <XCircle className="h-6 w-6 text-red-500 mr-2" />
+                    )}
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {result.passed ? 'Tüm testler başarıyla geçti!' : 'Bazı testler başarısız oldu'}
+                    </h2>
+                  </div>
+
+                  {result.output && (
+                      <div className="mb-4">
+                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Çıktı:</h3>
+                        <pre className="bg-gray-50 dark:bg-zinc-900 rounded p-3 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{result.output}</pre>
+                      </div>
+                  )}
+
+                  {result.errorMessage && (
+                      <div className="mb-4">
+                        <h3 className="text-sm font-medium text-red-700 mb-2">Hata:</h3>
+                        <pre className="bg-red-50 dark:bg-red-900/10 rounded p-3 text-sm text-red-800 dark:text-red-300 whitespace-pre-wrap">{result.errorMessage}</pre>
+                      </div>
+                  )}
+
+                  {!result.passed && !result.llmFeedback && (
+                      <button
+                          onClick={requestLLMFeedback}
+                          disabled={isRequestingFeedback}
+                          className="mt-4 flex items-center gap-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded shadow"
+                      >
+                        <Bot className="w-4 h-4" />
+                        {isRequestingFeedback ? 'Gönderiliyor...' : 'LLM Feedback Al'}
+                      </button>
+                  )}
+
+                  {result.llmFeedback && (
+                      <div className="mt-4">
+                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yapay Zeka Geri Bildirimi:</h3>
+                        <div className="bg-blue-50 dark:bg-blue-900/10 rounded p-3 text-sm text-blue-800 dark:text-blue-300 flex items-center gap-2">
+                          {result.llmFeedback === 'LLM geri bildirimi hazırlanıyor...' && (
+                              <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800 dark:border-blue-300" />
+                          )}
+                          <span>{result.llmFeedback}</span>
+                        </div>
+                      </div>
+                  )}
+                </div>
+            )}
           </div>
         </div>
       </div>
