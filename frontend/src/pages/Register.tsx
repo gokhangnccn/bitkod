@@ -9,18 +9,18 @@ import { api } from '../api/axios';
 
 const registerSchema = z.object({
   username: z.string()
-      .min(3, 'Username must be at least 3 characters')
-      .max(20, 'Username must be less than 20 characters')
-      .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'),
-  email: z.string().email('Invalid email address'),
+      .min(4, 'Kullanıcı adınız en az 4 karakterden oluşmalı')
+      .max(16, 'Kullanıcı adınız en fazal 16 karakter olabilir')
+      .regex(/^[a-zA-Z0-9_-]+$/, 'Kullanıcı adınız sadece şunları içerebilir: harfler, sayılar, özel karakterler'),
+  email: z.string().email('Geçersiz e-mail adresi'),
   password: z.string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
+      .min(8, 'Şifreniz en az 8 karakter olmalı')
+      .regex(/[A-Z]/, 'Şifreniz en az 1 büyük harf içermeli')
+      .regex(/[a-z]/, 'Şifreniz en az 1 küçük harf içermeli')
+      .regex(/[0-9]/, 'Şifreniz en az 1 sayı içermeli'),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Şifreleriniz eşleşmiyor",
   path: ["confirmPassword"],
 });
 
@@ -50,7 +50,7 @@ export function Register() {
         await login(response.data.Data.token);
         navigate('/');
       } else {
-        setError(response.data.Message || 'Registration failed');
+        setError(response.data.Message || 'Kayıt işlemi başarısız');
       }
     } catch (error: any) {
       setError(
@@ -68,12 +68,12 @@ export function Register() {
         <div className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-800 p-8 rounded-xl shadow-lg">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-              Create your account
+              Hesabınızı Oluşturun
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600 dark:text-zinc-400">
-              Already have an account?{' '}
+              Zaten bir hesaba sahip misiniz?{' '}
               <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign in
+                Giriş Yap
               </Link>
             </p>
           </div>
@@ -90,14 +90,14 @@ export function Register() {
               {/* Username */}
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Username
+                  Kullanıcı Adı
                 </label>
                 <div className="mt-1">
                   <input
                       {...register('username')}
                       type="text"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-zinc-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white sm:text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Choose a username"
+                      placeholder="Bir kullanıcı adı seçiniz"
                   />
                   {errors.username && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.username.message}</p>
@@ -115,7 +115,7 @@ export function Register() {
                       {...register('email')}
                       type="email"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-zinc-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white sm:text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Enter your email"
+                      placeholder="E-mail adresinizi giriniz"
                   />
                   {errors.email && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
@@ -126,14 +126,14 @@ export function Register() {
               {/* Password */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Password
+                  Şifre
                 </label>
                 <div className="mt-1">
                   <input
                       {...register('password')}
                       type="password"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-zinc-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white sm:text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Create a strong password"
+                      placeholder="Güçlü bir şifre oluşturun"
                   />
                   {errors.password && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
@@ -144,14 +144,14 @@ export function Register() {
               {/* Confirm Password */}
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Confirm Password
+                  Şifrenizi doğrulayın
                 </label>
                 <div className="mt-1">
                   <input
                       {...register('confirmPassword')}
                       type="password"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-zinc-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white sm:text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Confirm your password"
+                      placeholder="Girdiğiniz şifreyi tekrar giriniz"
                   />
                   {errors.confirmPassword && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword.message}</p>
@@ -170,7 +170,7 @@ export function Register() {
                   }`}
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                {isLoading ? 'Creating account...' : 'Create account'}
+                {isLoading ? 'Hesap Oluşturuluyor...' : 'Hesabını Oluştur'}
               </button>
             </div>
           </form>
