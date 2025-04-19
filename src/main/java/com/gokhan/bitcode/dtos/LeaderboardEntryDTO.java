@@ -11,4 +11,5 @@ public class LeaderboardEntryDTO {
     private int solvedProblemsCount;
     private double successRate;
     private int totalSubmissions;
+    private double score;
 }
