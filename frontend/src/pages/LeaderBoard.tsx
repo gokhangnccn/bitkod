@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/axios';
-import { BarChart3, User, BookOpen, Percent, BarChart2 } from 'lucide-react';
+import { BarChart3, User, BookOpen, Percent, BarChart2, Star } from 'lucide-react';
 import AdvancedModal from '../components/AdvancedModal';
 
 interface UserStats {
@@ -9,6 +9,7 @@ interface UserStats {
     solvedProblemsCount: number;
     successRate: number;
     totalSubmissions: number;
+    score: number;
 }
 
 export default function Leaderboard() {
@@ -54,6 +55,7 @@ export default function Leaderboard() {
                                 <th className="px-6 py-3">Çözülen</th>
                                 <th className="px-6 py-3">Başarı Oranı</th>
                                 <th className="px-6 py-3">Toplam Gönderim</th>
+                                <th className="px-6 py-3">Skor</th>
                             </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
@@ -62,26 +64,32 @@ export default function Leaderboard() {
                                     <td className="px-6 py-4 text-indigo-600 font-semibold">#{index + 1}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-gray-800 dark:text-white">
-                                            <User className="h-4 w-4 text-indigo-500" />
+                                            <User className="h-4 w-4 text-indigo-500"/>
                                             {user.username}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-gray-800 dark:text-white">
-                                            <BookOpen className="h-4 w-4 text-blue-500" />
+                                            <BookOpen className="h-4 w-4 text-blue-500"/>
                                             {user.solvedProblemsCount}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-gray-800 dark:text-white">
-                                            <Percent className="h-4 w-4 text-green-500" />
+                                            <Percent className="h-4 w-4 text-green-500"/>
                                             %{user.successRate.toFixed(2)}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-16 py-4">
                                         <div className="flex items-center gap-2 text-gray-800 dark:text-white">
-                                            <BarChart2 className="h-4 w-4 text-yellow-500" />
+                                            <BarChart2 className="h-4 w-4 text-yellow-500"/>
                                             {user.totalSubmissions}
+                                        </div>
+                                    </td>
+                                    <td className="px-2 py-4">
+                                        <div className="flex items-center gap-2 text-gray-800 dark:text-white">
+                                            <Star className="h-4 w-4 text-yellow-500"/>
+                                            {user.score.toFixed(2)}
                                         </div>
                                     </td>
                                 </tr>
