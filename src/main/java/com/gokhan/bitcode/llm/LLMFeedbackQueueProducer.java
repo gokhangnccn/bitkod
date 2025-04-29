@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LLMFeedbackQueueProducer {
-
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void enqueueFeedbackTask(FeedbackTask task) {
-        redisTemplate.opsForList().rightPush("llm-feedback-queue", task);
+    private static final String QUEUE_NAME = "llm-feedback-queue";
+
+    public void enqueue(FeedbackTask task) {
+        redisTemplate.opsForList().rightPush(QUEUE_NAME, task);
     }
 }
+

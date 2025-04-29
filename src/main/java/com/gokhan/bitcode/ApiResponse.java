@@ -81,6 +81,15 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> llmFeedbackUnavailable() {
         return serverError("BIT-1005", "LLM feedback service unavailable");
     }
+
+    public static <T> ApiResponse<T> fail(String label, String message) {
+        return new ApiResponse<>(false, 400, label, message, null);
+    }
+
+    public static <T> ApiResponse<T> fail(String message) {
+        return new ApiResponse<>(false, 400, "BIT-9999", message, null);
+    }
+
     @JsonIgnore
     public boolean getSucceeded() {
         return isSucceeded;

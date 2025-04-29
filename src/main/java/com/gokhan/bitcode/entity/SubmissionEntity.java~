@@ -46,6 +46,9 @@ public class SubmissionEntity {
 
     @Column
     private Integer codeQualityScore;
+
+    @Column(columnDefinition = "TEXT")
+    private String codeQualityFeedback;
 }
 
 

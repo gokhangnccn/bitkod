@@ -1,12 +1,12 @@
 package com.gokhan.bitcode.llm;
 
 import com.gokhan.bitcode.dtos.FeedbackTask;
+import com.gokhan.bitcode.dtos.WebSocketMessageDTO;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,42 +20,54 @@ public class LLMFeedbackWorker {
     private final LLMFeedbackService llmFeedbackService;
     private final SubmissionRepository submissionRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Scheduled(fixedDelay = 2000)
     public void consume() {
         Long size = redisTemplate.opsForList().size(QUEUE_NAME);
-        log.info("Kuyrukta bekleyen gorev sayisi: {}", size);
+        log.info("Kuyrukta bekleyen görev sayısı: {}", size);
 
         Object obj = redisTemplate.opsForList().leftPop(QUEUE_NAME);
         if (obj instanceof FeedbackTask task) {
-            log.info("Gorev alindi. SubmissionId: {}", task.submissionId());
+            log.info("Görev alındı. SubmissionId: {}, Tür: {}", task.submissionId(), task.type());
 
             submissionRepository.findById(task.submissionId()).ifPresentOrElse(submission -> {
-                llmFeedbackService.getFeedback(
-                        task.problemDescription(),
-                        task.code(),
-                        task.errorMessage(),
-                        submission.getUserId()
-                ).subscribe(feedback -> {
-                    submission.setLlmFeedback(feedback);
-                    submissionRepository.save(submission);
-                    log.info("Feedback kaydedildi. SubmissionId: {}", submission.getId());
+                switch (task.type()) {
+                    case ERROR_ANALYSIS -> {
+                        llmFeedbackService.getFeedback(
+                                task.problemDescription(),
+                                task.code(),
+                                task.errorMessage(),
+                                submission.getUserId()
+                        ).subscribe(feedback -> {
+                            submission.setLlmFeedback(feedback);
+                            submissionRepository.save(submission);
+                        }, error -> log.error("Feedback alınamadı: {}", error.getMessage()));
+                    }
 
-                    // Doğrudan SimpMessagingTemplate kullanarak mesaj gönderiyoruz
-                    String destination = "/user/" + submission.getUserId() + "/topic/feedback";
-                    log.info("WebSocket message sending to: {}", destination);
-                    messagingTemplate.convertAndSendToUser(
-                            submission.getUserId().toString(),
-                            "/topic/feedback",
-                            feedback
-                    );
-                }, error -> {
-                    log.error("Feedback alinamadi: {}", error.getMessage());
-                });
-            }, () -> {
-                log.warn("Submission bulunamadi. ID: {}", task.submissionId());
-            });
+                    case CODE_QUALITY_SCORE -> {
+                        llmFeedbackService.evaluateCodeQuality(
+                                task.problemDescription(),
+                                submission.getCode(),
+                                submission.getUserId()
+                        ).subscribe(score -> {
+                            submission.setCodeQualityScore(score);
+                            submissionRepository.save(submission);
+                        });
+                    }
+
+                    case CODE_QUALITY_REASON -> {
+                        llmFeedbackService.explainCodeQuality(
+                                task.problemDescription(),
+                                submission.getCode(),
+                                submission.getUserId()
+                        ).subscribe(feedback -> {
+                            submission.setLlmFeedback(feedback);
+                            submissionRepository.save(submission);
+                        }, error -> log.error("Kod kalitesi açıklaması alınamadı: {}", error.getMessage()));
+                    }
+
+                }
+            }, () -> log.warn("Submission bulunamadı. ID: {}", task.submissionId()));
         }
     }
 }
