@@ -5,6 +5,7 @@ import com.gokhan.bitcode.dtos.FeedbackTask;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
 import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
+import com.gokhan.bitcode.enums.FeedbackType;
 import com.gokhan.bitcode.llm.LLMFeedbackQueueProducer;
 import com.gokhan.bitcode.llm.LLMFeedbackService;
 import com.gokhan.bitcode.repository.ProblemRepository;
@@ -27,6 +28,8 @@ public class SubmissionService {
     private final CodeExecutionService codeExecutionService;
 
     private final ProblemRepository problemRepository;
+
+    private final LLMFeedbackQueueProducer llmFeedbackQueueProducer;
 
     @Transactional
     public ApiResponse<SubmissionEntity> createSubmission(SubmissionEntity submission, UserClaims userClaims) {
@@ -51,13 +54,24 @@ public class SubmissionService {
             Boolean passed = future.get();
             submission.setPassed(passed);
             SubmissionEntity saved = submissionRepository.save(submission);
+
+            if (passed) {
+                FeedbackTask task = new FeedbackTask(
+                        saved.getId(),
+                        problem.getDescription(),
+                        saved.getCode(),
+                        null,
+                        FeedbackType.CODE_QUALITY_SCORE
+                );
+                // LLM kuyruğuna gönder
+                llmFeedbackQueueProducer.enqueue(task);
+            }
+
             return ApiResponse.success(saved);
         } catch (Exception e) {
             return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu: " + e.getMessage());
         }
     }
-
-
 
     public ApiResponse<List<SubmissionEntity>> getSubmissionsByUserId(Long userId, UserClaims userClaims) {
         if (!userClaims.getUserId().equals(String.valueOf(userId)) &&
