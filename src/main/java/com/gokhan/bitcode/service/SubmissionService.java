@@ -100,12 +100,14 @@ public class SubmissionService {
             long successful = submissionRepository.countByUserIdAndPassedTrue(userId);
             long solvedProblems = submissionRepository.countDistinctByUserIdAndPassedTrue(userId);
             double successRate = (total == 0) ? 0.0 : (successful * 100.0 / total);
+            double codeQualityScore = submissionRepository.findAverageCodeQualityScoreByUserId(userId);
 
             SubmissionStatsDTO stats = SubmissionStatsDTO.builder()
                     .totalSubmissions(total)
                     .successfulSubmissions(successful)
                     .solvedProblemsCount(solvedProblems)
                     .successRate(successRate)
+                    .averageCodeQualityScore(codeQualityScore)
                     .build();
 
             return ApiResponse.success(stats);
