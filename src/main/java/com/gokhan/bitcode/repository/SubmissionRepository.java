@@ -37,4 +37,8 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     List<Long> findSolvedProblemIdsByUserId(@Param("userId") Long userId);
 
     boolean existsByUserIdAndProblemIdAndPassedTrue(Long userId, Long problemId);
+
+    @Query("SELECT AVG(s.codeQualityScore) FROM SubmissionEntity s WHERE s.userId = :userId AND s.passed = true")
+    Double findAverageCodeQualityScoreByUserId(@Param("userId") Long userId);
+
 }
