@@ -14,6 +14,7 @@ interface SubmissionStats {
     successfulSubmissions: number;
     solvedProblemsCount: number;
     successRate: number;
+    averageCodeQualityScore: number;
 }
 
 interface UserProfile {
@@ -61,12 +62,7 @@ const AccountPage = () => {
         fetchData();
     }, []);
 
-    const StatCard = ({
-                          icon: Icon,
-                          label,
-                          value,
-                          color,
-                      }: {
+    const StatCard = ({icon: Icon, label, value, color}: {
         icon: any;
         label: string;
         value: string | number;
@@ -140,6 +136,12 @@ const AccountPage = () => {
                                 label="Başarı Oranı"
                                 value={`%${stats.successRate.toFixed(2)}`}
                                 color="border-yellow-500"
+                            />
+                            <StatCard
+                                icon={BarChart2}
+                                label="Ortalama Kod Kalite Skoru"
+                                value={stats.averageCodeQualityScore ? stats.averageCodeQualityScore.toFixed(2) : 'N/A'}
+                                color="border-purple-500"
                             />
                         </div>
                     </>

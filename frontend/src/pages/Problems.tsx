@@ -14,11 +14,12 @@ interface Problem {
 
 export function Problems() {
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [solvedProblems, setSolvedProblems] = useState<Record<number, string>>({});
+  const [solvedProblems, setSolvedProblems] = useState<Record<number, { submittedAt: string, codeQualityScore: number }>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,13 +40,17 @@ export function Problems() {
 
         const solvedRes = await api.get(`/submissions/user/${userId}`);
         if (solvedRes.data.IsSucceeded) {
-          const solvedMap: Record<number, string> = {};
+          const solvedMap: Record<number, { submittedAt: string, codeQualityScore: number }> = {};
           solvedRes.data.Data.forEach((s: any) => {
             if (s.passed && !solvedMap[s.problemId]) {
-              solvedMap[s.problemId] = s.submittedAt;
+              solvedMap[s.problemId] = {
+                submittedAt: s.submittedAt,
+                codeQualityScore: s.codeQualityScore ?? 0,
+              };
             }
           });
           setSolvedProblems(solvedMap);
+
         }
       } catch (err: any) {
         setError(err.response?.data?.Message || 'Veriler alınırken hata oluştu');
@@ -70,10 +75,16 @@ export function Problems() {
     }
   };
 
+  const getCodeQualityColor = (score: number) => {
+    if (score >= 80) return 'bg-green-100 text-green-700 border-green-300 dark:bg-green-800/20 dark:text-green-300';
+    if (score >= 50) return 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-800/20 dark:text-yellow-300';
+    return 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800/20 dark:text-red-300';
+  };
+
   const handleProblemClick = (e: React.MouseEvent, problemId: number) => {
     if (solvedProblems[problemId]) {
       e.preventDefault();
-      const solvedDate = new Date(solvedProblems[problemId]).toLocaleDateString('tr-TR');
+      const solvedDate = new Date(solvedProblems[problemId].submittedAt).toLocaleDateString('tr-TR');
       setModalMessage(`Bu problemi ${solvedDate} tarihinde başarıyla çözdünüz. Yeniden açamazsınız.`);
       setShowModal(true);
     }
@@ -103,13 +114,13 @@ export function Problems() {
   return (
       <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 space-y-4 sm:space-y-0">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               <BookOpen className="h-8 w-8 mr-3 text-indigo-600" />
               Problemler
               <span className="ml-4 text-sm text-gray-500 dark:text-gray-400 font-normal">
-              ({Object.keys(solvedProblems).length}/{problems.length} çözüldü)
-            </span>
+            ({Object.keys(solvedProblems).length}/{problems.length} çözüldü)
+          </span>
             </h1>
           </div>
 
@@ -118,7 +129,7 @@ export function Problems() {
               {problems.map((problem) => (
                   <li
                       key={problem.id}
-                      className={`transition-all duration-150 ${
+                      className={`rounded-md transition-all duration-150 ${
                           solvedProblems[problem.id]
                               ? 'opacity-70 bg-green-50 dark:bg-green-900/10'
                               : 'hover:bg-gray-50 dark:hover:bg-zinc-700'
@@ -126,15 +137,20 @@ export function Problems() {
                   >
                     <Link
                         to={`/problems/${problem.id}`}
-                        className="block p-6"
+                        className="block p-6 rounded-md hover:shadow-md transition-shadow"
                         onClick={(e) => handleProblemClick(e, problem.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
                             {problem.title}
                             {solvedProblems[problem.id] && (
-                                <CheckCircle className="inline-block h-5 w-5 text-green-500 ml-2" />
+                                <CheckCircle className="h-5 w-5 text-green-500 ml-2" />
+                            )}
+                            {solvedProblems[problem.id] && (
+                                <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300">
+                          Çözüldü
+                        </span>
                             )}
                           </h2>
                           <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
@@ -142,21 +158,33 @@ export function Problems() {
                           </p>
                         </div>
                         <div className="ml-6">
-                      <span
-                          className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(
-                              problem.difficulty
-                          )}`}
-                      >
-                        {problem.difficulty}
-                      </span>
+                    <span
+                        className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(
+                            problem.difficulty
+                        )}`}
+                    >
+                      {problem.difficulty}
+                    </span>
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <div className="mt-4 flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 dark:text-gray-400 gap-1 sm:gap-6">
                         <span>Oluşturulma: {new Date(problem.createdAt).toLocaleDateString()}</span>
                         {solvedProblems[problem.id] && (
-                            <span className="ml-6 text-green-600 dark:text-green-400">
-                        Çözüm tarihi: {new Date(solvedProblems[problem.id]).toLocaleDateString()}
+                            <span
+                                className={`flex items-center gap-2 ${getCodeQualityColor(
+                                    solvedProblems[problem.id].codeQualityScore
+                                )}`}
+                            >
+                            Çözüm: {new Date(solvedProblems[problem.id].submittedAt).toLocaleDateString()}
+                              <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCodeQualityColor(
+                                      solvedProblems[problem.id].codeQualityScore
+                                  )}`}
+                                  title={`Kod kalitesi: ${solvedProblems[problem.id].codeQualityScore}/100`}
+                              >
+                        Kod Kalitesi: {solvedProblems[problem.id].codeQualityScore}
                       </span>
+                    </span>
                         )}
                       </div>
                     </Link>
@@ -167,8 +195,9 @@ export function Problems() {
 
           {problems.length === 0 && (
               <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Problem bulunamadı</h3>
-                <p className="mt-2 text-gray-500 dark:text-gray-400">Yeni sorular için tekrar kontrol edin.</p>
+                <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-400 dark:text-gray-600" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Hiç problem bulunamadı</h3>
+                <p className="mt-2 text-gray-500 dark:text-gray-400">Yeni sorular için tekrar uğrayın.</p>
               </div>
           )}
         </div>
@@ -180,4 +209,5 @@ export function Problems() {
         />
       </div>
   );
+
 }
