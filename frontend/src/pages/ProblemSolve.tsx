@@ -10,6 +10,7 @@ import { useCallback } from 'react';
 
 interface Problem {
   id: number;
+  uid: string;
   title: string;
   description: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
@@ -27,7 +28,7 @@ interface SubmissionResponse {
 }
 
 export function ProblemSolve() {
-  const { id } = useParams();
+  const { uid } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
@@ -72,7 +73,7 @@ export function ProblemSolve() {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const response = await api.get(`/problems/${id}`);
+        const response = await api.get(`/problems/${uid}`);
         if (response.data.IsSucceeded) {
           setProblem(response.data.Data);
         } else {
@@ -84,7 +85,7 @@ export function ProblemSolve() {
     };
 
     fetchProblem();
-  }, [id]);
+  }, [uid]);
 
   useEffect(() => {
     setCode(

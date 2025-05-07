@@ -22,7 +22,7 @@ function App() {
                         <Route path="/account" element={<Account />} />
                         <Route path="/leaderboard" element={<Leaderboard />} />
                         <Route path="/problems" element={<Problems />} />
-                        <Route path="/problems/:id" element={<ProblemSolve />} />
+                        <Route path="/problems/:uid" element={<ProblemSolve />} />
                     </Routes>
                 </Layout>
             </AuthProvider>
