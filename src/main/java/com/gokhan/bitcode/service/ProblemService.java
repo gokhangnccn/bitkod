@@ -22,8 +22,8 @@ public class ProblemService {
         return ApiResponse.success(problemRepository.findAll());
     }
 
-    public ApiResponse<ProblemEntity> getProblemById(Long id) {
-        return problemRepository.findById(id)
+    public ApiResponse<ProblemEntity> getProblemByUid(String uid) {
+        return problemRepository.findByUid(uid)
                 .map(ApiResponse::success)
                 .orElse(ApiResponse.problemNotFound());
     }
@@ -63,5 +63,6 @@ public class ProblemService {
         problemRepository.deleteById(id);
         return ApiResponse.success(null);
     }
+
 }
 

@@ -22,6 +22,9 @@ public class ProblemEntity {
     @Column(nullable = false, length = 100)
     private String title;
 
+    @Column(nullable = false, unique = true, updatable = false, length = 36)
+    private String uid;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -38,4 +41,14 @@ public class ProblemEntity {
     private String createdBy;
 
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void generateUid() {
+        if (uid == null) {
+            uid = java.util.UUID.randomUUID().toString();
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

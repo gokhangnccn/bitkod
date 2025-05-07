@@ -23,9 +23,9 @@ public class ProblemController {
         return ResponseEntity.ok(problemService.getAllProblems());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProblemEntity>> getProblemById(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemById(id));
+    @GetMapping("{uid}")
+    public ResponseEntity<ApiResponse<ProblemEntity>> getProblemByUid(@PathVariable String uid) {
+        return ResponseEntity.ok(problemService.getProblemByUid(uid));
     }
 
     @PostMapping("/createproblem")
