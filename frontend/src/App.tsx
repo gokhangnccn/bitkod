@@ -7,8 +7,8 @@ import { Register } from './pages/Register';
 import { Problems } from './pages/Problems';
 import { ProblemSolve } from './pages/ProblemSolve';
 import { AuthProvider } from './context/AuthContext';
-import Account from "./pages/Account.tsx";
-import Leaderboard from "./pages/LeaderBoard.tsx";
+import Account from "./pages/Account";
+import Leaderboard from "./pages/LeaderBoard";
 
 function App() {
     return (
