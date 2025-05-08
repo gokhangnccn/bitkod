@@ -1,7 +1,7 @@
 package com.gokhan.bitcode.controller;
 
 import com.gokhan.bitcode.ApiResponse;
-import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
+import com.gokhan.bitcode.dtos.SubmissionStatsResponse;
 import com.gokhan.bitcode.entity.SubmissionEntity;
 import com.gokhan.bitcode.service.SubmissionService;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -47,10 +47,10 @@ public class SubmissionController {
     }
 
     @GetMapping("/user/{userId}/stats")
-    public ResponseEntity<ApiResponse<SubmissionStatsDTO>> getUserStats(@PathVariable Long userId,
+    public ResponseEntity<ApiResponse<SubmissionStatsResponse>> getUserStats(@PathVariable Long userId,
                                                                         Authentication authentication) {
         UserClaims userClaims = (UserClaims) authentication.getPrincipal();
-        ApiResponse<SubmissionStatsDTO> response = submissionService.getUserSubmissionStats(userId, userClaims);
+        ApiResponse<SubmissionStatsResponse> response = submissionService.getUserSubmissionStats(userId);
         return ResponseEntity.status(response.getResultCode()).body(response);
     }
 
@@ -69,6 +69,5 @@ public class SubmissionController {
         ApiResponse<List<Long>> response = submissionService.getSolvedProblemsByUser(userId, userClaims);
         return ResponseEntity.status(response.getResultCode()).body(response);
     }
-
 }
 

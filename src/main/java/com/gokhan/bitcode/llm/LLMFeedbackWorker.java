@@ -21,14 +21,14 @@ public class LLMFeedbackWorker {
     private final SubmissionRepository submissionRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Scheduled(fixedDelay = 2000)
+    @Scheduled(fixedDelay = 3000)
     public void consume() {
         Long size = redisTemplate.opsForList().size(QUEUE_NAME);
-        log.info("Kuyrukta bekleyen görev sayısı: {}", size);
+        log.info("Kuyruktaki Gorevler: {}", size);
 
         Object obj = redisTemplate.opsForList().leftPop(QUEUE_NAME);
         if (obj instanceof FeedbackTask task) {
-            log.info("Görev alındı. SubmissionId: {}, Tür: {}", task.submissionId(), task.type());
+            log.info("Gorev alındı. SubmissionId: {}, Tur: {}", task.submissionId(), task.type());
 
             submissionRepository.findById(task.submissionId()).ifPresentOrElse(submission -> {
                 switch (task.type()) {
@@ -41,7 +41,7 @@ public class LLMFeedbackWorker {
                         ).subscribe(feedback -> {
                             submission.setLlmFeedback(feedback);
                             submissionRepository.save(submission);
-                        }, error -> log.error("Feedback alınamadı: {}", error.getMessage()));
+                        }, error -> log.error("Hata aciklamasi alinamadi: {}", error.getMessage()));
                     }
 
                     case CODE_QUALITY_SCORE -> {
@@ -52,7 +52,7 @@ public class LLMFeedbackWorker {
                         ).subscribe(score -> {
                             submission.setCodeQualityScore(score);
                             submissionRepository.save(submission);
-                        });
+                        }, error -> log.error("Kod kalitesi puani alinamadi: {}", error.getMessage()));
                     }
 
                     case CODE_QUALITY_REASON -> {
@@ -63,11 +63,11 @@ public class LLMFeedbackWorker {
                         ).subscribe(feedback -> {
                             submission.setLlmFeedback(feedback);
                             submissionRepository.save(submission);
-                        }, error -> log.error("Kod kalitesi açıklaması alınamadı: {}", error.getMessage()));
+                        }, error -> log.error("Kod kalitesi aciklamasi alinamadi: {}", error.getMessage()));
                     }
 
                 }
-            }, () -> log.warn("Submission bulunamadı. ID: {}", task.submissionId()));
+            }, () -> log.warn("Submission bulunamadi. ID: {}", task.submissionId()));
         }
     }
 }
