@@ -3,11 +3,11 @@ package com.gokhan.bitcode.service;
 import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.FeedbackTask;
 import com.gokhan.bitcode.dtos.SubmissionStatsDTO;
+import com.gokhan.bitcode.dtos.SubmissionStatsResponse;
 import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
 import com.gokhan.bitcode.enums.FeedbackType;
 import com.gokhan.bitcode.llm.LLMFeedbackQueueProducer;
-import com.gokhan.bitcode.llm.LLMFeedbackService;
 import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,6 +134,77 @@ public class SubmissionService {
         }
         List<Long> solvedIds = submissionRepository.findSolvedProblemIdsByUserId(userId);
         return ApiResponse.success(solvedIds);
+    }
+
+    public ApiResponse<SubmissionStatsResponse> getUserSubmissionStats(Long userId) {
+        List<SubmissionEntity> submissions = submissionRepository.findByUserId(userId);
+
+        // Son 7 günün gönderim sayıları
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Map<String, Long> submissionsByDay = submissions.stream()
+                .filter(sub -> sub.getSubmittedAt().isAfter(sevenDaysAgo))
+                .collect(Collectors.groupingBy(
+                        sub -> sub.getSubmittedAt().format(DateTimeFormatter.ISO_DATE),
+                        Collectors.counting()
+                ));
+
+        // Programlama dillerine göre gönderim sayıları
+        Map<String, Long> submissionsByLanguage = submissions.stream()
+                .collect(Collectors.groupingBy(
+                        SubmissionEntity::getLanguage,
+                        Collectors.counting()
+                ));
+
+        // Zorluk seviyelerine göre problem sayıları
+        Map<String, Long> submissionsByDifficulty = submissions.stream()
+                .collect(Collectors.groupingBy(
+                        sub -> sub.getProblemId().toString(), // Problem ID'yi string'e çevir
+                        Collectors.counting()
+                ));
+
+        // Toplam ve başarılı gönderim sayıları
+        long totalSubmissions = submissions.size();
+        long successfulSubmissions = submissions.stream()
+                .filter(SubmissionEntity::getPassed)
+                .count();
+
+        // Çözülen problem sayısı (tekrar eden problemler sayılmaz)
+        long solvedProblemsCount = submissions.stream()
+                .filter(SubmissionEntity::getPassed)
+                .map(SubmissionEntity::getProblemId)
+                .distinct()
+                .count();
+
+        // Başarı oranı
+        double successRate = totalSubmissions > 0 
+                ? (double) successfulSubmissions / totalSubmissions * 100 
+                : 0;
+
+        // Ortalama kod kalite skoru
+        double averageCodeQualityScore = submissions.stream()
+                .filter(sub -> sub.getCodeQualityScore() != null)
+                .mapToInt(SubmissionEntity::getCodeQualityScore)
+                .average()
+                .orElse(0.0);
+
+        SubmissionStatsResponse stats = SubmissionStatsResponse.builder()
+                .totalSubmissions(totalSubmissions)
+                .successfulSubmissions(successfulSubmissions)
+                .solvedProblemsCount(solvedProblemsCount)
+                .successRate(successRate)
+                .averageCodeQualityScore(averageCodeQualityScore)
+                .submissionsByDay(submissionsByDay.entrySet().stream()
+                        .map(entry -> SubmissionStatsResponse.DayCount.of(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList()))
+                .submissionsByLanguage(submissionsByLanguage.entrySet().stream()
+                        .map(entry -> SubmissionStatsResponse.LanguageCount.of(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList()))
+                .submissionsByDifficulty(submissionsByDifficulty.entrySet().stream()
+                        .map(entry -> SubmissionStatsResponse.DifficultyCount.of(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList()))
+                .build();
+
+        return ApiResponse.success(stats);
     }
 
 }
