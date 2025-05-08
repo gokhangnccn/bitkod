@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -156,11 +157,16 @@ public class SubmissionService {
                 ));
 
         // Zorluk seviyelerine göre problem sayıları
-        Map<String, Long> submissionsByDifficulty = submissions.stream()
-                .collect(Collectors.groupingBy(
-                        sub -> sub.getProblemId().toString(), // Problem ID'yi string'e çevir
-                        Collectors.counting()
-                ));
+        Map<String, Long> submissionsByDifficulty = new HashMap<>();
+        for (SubmissionEntity submission : submissions) {
+            if (submission.getPassed()) {  // Sadece başarılı gönderimleri say
+                ProblemEntity problem = problemRepository.findById(submission.getProblemId()).orElse(null);
+                if (problem != null) {
+                    String difficulty = problem.getDifficulty().toString();
+                    submissionsByDifficulty.merge(difficulty, 1L, Long::sum);
+                }
+            }
+        }
 
         // Toplam ve başarılı gönderim sayıları
         long totalSubmissions = submissions.size();
