@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -73,13 +75,13 @@ public class LLMFeedbackService {
             - Gereksiz kodlardan arındırılmış olması
             - Fonksiyonların tek sorumluluğu olması
             - Kod tekrarı olmaması
-
+        
             Problem Tanımı:
             %s
             Kod:
             %s
-
-            [100 üzerinden puan ver, sadece sayısal puan(integer) döndür.]
+        
+            [Lütfen bu kod kalitesine 0 ile 100 arasında (sınırlar dahil) bir tam sayı puan verin. Başka herhangi bir metin veya açıklama eklemeyin.]
             """.formatted(problemDescription, code);
 
         return webClientBuilder.build()
@@ -102,7 +104,17 @@ public class LLMFeedbackService {
                     String content = response.getChoices().get(0).getMessage().getContent();
                     int score;
                     try {
-                        score = Integer.parseInt(content.replaceAll("\\D", ""));
+                        Pattern pattern = Pattern.compile("\\d+");
+                        Matcher matcher = pattern.matcher(content);
+                        if (matcher.find()) {
+                            score = Integer.parseInt(matcher.group(0));
+                            if (score > 100) {
+                                // Puan 100'den büyükse düzeltme yapabilir?
+                                score = Math.min(score, 100);
+                            }
+                        } else {
+                            score = 0; // Puan bulunamazsa varsayılan bir değer atanır
+                        }
                     } catch (NumberFormatException e) {
                         score = 0;
                     }
