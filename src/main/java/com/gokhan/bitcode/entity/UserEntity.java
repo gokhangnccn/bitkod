@@ -25,8 +25,9 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false)
     private String passwordHash;
+
+    private String provider; // "GOOGLE", "LOCAL"
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -34,6 +35,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    private boolean enabled = false;
 
     public String getPassword() {
         return this.passwordHash;

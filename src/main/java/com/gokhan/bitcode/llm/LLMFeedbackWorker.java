@@ -1,7 +1,6 @@
 package com.gokhan.bitcode.llm;
 
 import com.gokhan.bitcode.dtos.FeedbackTask;
-import com.gokhan.bitcode.dtos.WebSocketMessageDTO;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -36,6 +35,7 @@ public class LLMFeedbackWorker {
                         llmFeedbackService.getFeedback(
                                 task.problemDescription(),
                                 task.code(),
+                                submission.getLanguage(),
                                 task.errorMessage(),
                                 submission.getUserId()
                         ).subscribe(feedback -> {
@@ -47,11 +47,15 @@ public class LLMFeedbackWorker {
                     case CODE_QUALITY_SCORE -> {
                         llmFeedbackService.evaluateCodeQuality(
                                 task.problemDescription(),
-                                submission.getCode(),
+                                task.code(),
+                                submission.getLanguage(),
                                 submission.getUserId()
                         ).subscribe(score -> {
                             submission.setCodeQualityScore(score);
                             submissionRepository.save(submission);
+                            log.info("CODE quality için kullanılacak kod: {}", submission.getCode());
+                            log.info("Alternatif: task.code() = {}", task.code());
+
                         }, error -> log.error("Kod kalitesi puani alinamadi: {}", error.getMessage()));
                     }
 
@@ -59,6 +63,7 @@ public class LLMFeedbackWorker {
                         llmFeedbackService.explainCodeQuality(
                                 task.problemDescription(),
                                 submission.getCode(),
+                                submission.getLanguage(),
                                 submission.getUserId()
                         ).subscribe(feedback -> {
                             submission.setLlmFeedback(feedback);
