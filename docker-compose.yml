@@ -1,16 +1,23 @@
 services:
-  code-runner:
+  code-runner: # Java runner servisi
     build:
       context: ./docker/code-runner
-    container_name: code-runner
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./runner:/app
+    image: java-runner  # <-- BU SATIRI EKLEYİN/GÜNCELLEYİN
+    container_name: java-runner-service-container # docker-compose up ile çalıştırılırsa container'ın adı
+    # stdin_open, tty, volumes: Bu ayarlar ProcessBuilder ile anlık oluşturulan container'lar için
+    # doğrudan etkili değildir, çünkü ProcessBuilder kendi 'docker run' komutunda bunları belirtir.
+    # Bu servis 'docker-compose up' ile sürekli çalıştırılmayacaksa bu satırlar gereksiz olabilir.
+
+  python-runner-service: # Python runner servisi
+    build:
+      context: ./docker/python-runner
+    image: python-runner # <-- BU SATIRI EKLEYİN/GÜNCELLEYİN
+    container_name: python-runner-service-container
+    # stdin_open, tty, volumes: Benzer şekilde, anlık container'lar için daha az relevant.
+
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
     restart: always
-

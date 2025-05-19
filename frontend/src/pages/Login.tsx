@@ -7,12 +7,14 @@ import { useAuth } from '../context/AuthContext';
 import { LogIn, AlertCircle } from 'lucide-react';
 import { api } from '../api/axios';
 
-const loginSchema = z.object({
-  username: z.string().min(1, 'Kullanıcı adı girmelisiniz'),
-  password: z.string().min(6, 'Şifreniz en az 6 karakter içermeli'),
+import { usernameSchema, basicPasswordSchema } from "../utils/validationFields.ts";
+
+export const loginSchema = z.object({
+  username: usernameSchema,
+  password: basicPasswordSchema
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;
 
 export function Login() {
   const navigate = useNavigate();
@@ -68,8 +70,9 @@ export function Login() {
           </div>
 
           {error && (
-              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-4 flex items-center text-red-700 dark:text-red-300">
-                <AlertCircle className="h-5 w-5 mr-3" />
+              <div
+                  className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-4 flex items-center text-red-700 dark:text-red-300">
+                <AlertCircle className="h-5 w-5 mr-3"/>
                 <span className="text-sm">{error}</span>
               </div>
           )}
@@ -119,7 +122,7 @@ export function Login() {
                       isLoading ? 'opacity-75 cursor-not-allowed' : ''
                   }`}
               >
-                <LogIn className="h-4 w-4 mr-2" />
+                <LogIn className="h-4 w-4 mr-2"/>
                 {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
               </button>
             </div>
@@ -132,6 +135,20 @@ export function Login() {
               </div>
             </div>
           </form>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">veya</p>
+            <a
+                href="http://localhost:8040/oauth2/authorization/google"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-sm font-medium text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-600 transition-colors"
+            >
+              <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google Logo"
+                  className="w-5 h-5 mr-2"
+              />
+              Google ile Giriş Yap
+            </a>
+          </div>
         </div>
       </div>
   );

@@ -27,7 +27,14 @@ public class LLMFeedbackService {
 
     private final FeedbackWebSocketController feedbackWebSocketController;
 
-    public Mono<String> getFeedback(String problemDescription, String code, String errorMessage, Long userId) {
+    public Mono<String> getFeedback(String problemDescription, String code, String language, String errorMessage, Long userId) {
+        language = language != null ? language.toLowerCase() : "java";
+
+        String systemMessage = switch (language) {
+            case "python" -> "Sen deneyimli bir Python code reviewer’sın. Sadece puanla.";
+            default -> "Sen deneyimli bir Java code reviewer’sın. Sadece puanla.";
+        };
+
         String prompt = """
                 Problem Tanımı:
                 %s
@@ -51,7 +58,7 @@ public class LLMFeedbackService {
                         "max_tokens", 200,
                         "temperature", 0.3,
                         "messages", new Object[]{
-                                Map.of("role", "system", "content", "Sen deneyimli bir Java eğitmenisin. Kullanıcıya kodun nasıl çözüldüğünü değil, nerede hata yaptığını kısaca ipucu olarak ver."),
+                                Map.of("role", "system", "content", systemMessage),
                                 Map.of("role", "user", "content", prompt)
                         }
                 ))
@@ -67,22 +74,48 @@ public class LLMFeedbackService {
                 });
     }
 
-    public Mono<Integer> evaluateCodeQuality(String problemDescription, String code, Long userId) {
-        String prompt = """
+    public Mono<Integer> evaluateCodeQuality(String problemDescription, String code, String language, Long userId) {
+        language = language != null ? language.toLowerCase() : "java";
+
+        String systemMessage = switch (language) {
+            case "python" -> "Sen deneyimli bir Python code reviewer’sın. Sadece puanla.";
+            default -> "Sen deneyimli bir Java code reviewer’sın. Sadece puanla.";
+        };
+
+        String langPrompt = switch (language) {
+            case "python" -> """
+            Aşağıdaki Python kodunu temiz kod prensiplerine göre değerlendir.
+            Kriterler:
+            - Anlaşılabilirlik (isimlendirme, okunabilirlik)
+            - Gereksiz kodlardan arındırılmış olması
+            - Fonksiyonların tek sorumluluğu olması
+            - Kod tekrarı olmaması
+
+            Problem Tanımı:
+            %s
+            Kod:
+            %s
+
+            [Lütfen bu kod kalitesine 0 ile 100 arasında (sınırlar dahil) bir tam sayı puan verin. Başka herhangi bir metin veya açıklama eklemeyin.]
+            """;
+            default -> """
             Aşağıdaki Java kodunu temiz kod prensiplerine göre değerlendir.
             Kriterler:
             - Anlaşılabilirlik (isimlendirme, okunabilirlik)
             - Gereksiz kodlardan arındırılmış olması
             - Fonksiyonların tek sorumluluğu olması
             - Kod tekrarı olmaması
-        
+
             Problem Tanımı:
             %s
             Kod:
             %s
-        
+
             [Lütfen bu kod kalitesine 0 ile 100 arasında (sınırlar dahil) bir tam sayı puan verin. Başka herhangi bir metin veya açıklama eklemeyin.]
-            """.formatted(problemDescription, code);
+            """;
+        };
+
+        String prompt = langPrompt.formatted(problemDescription, code);
 
         return webClientBuilder.build()
                 .post()
@@ -94,7 +127,7 @@ public class LLMFeedbackService {
                         "max_tokens", 50,
                         "temperature", 0,
                         "messages", new Object[]{
-                                Map.of("role", "system", "content", "Sen deneyimli bir Java code reviewer’sın. Sadece puanla."),
+                                Map.of("role", "system", "content", systemMessage),
                                 Map.of("role", "user", "content", prompt)
                         }
                 ))
@@ -108,36 +141,61 @@ public class LLMFeedbackService {
                         Matcher matcher = pattern.matcher(content);
                         if (matcher.find()) {
                             score = Integer.parseInt(matcher.group(0));
-                            if (score > 100) {
-                                // Puan 100'den büyükse düzeltme yapabilir?
-                                score = Math.min(score, 100);
-                            }
+                            score = Math.min(score, 100); // 100'den büyükse sınırla
                         } else {
-                            score = 0; // Puan bulunamazsa varsayılan bir değer atanır
+                            score = 0;
                         }
                     } catch (NumberFormatException e) {
                         score = 0;
                     }
-                    feedbackWebSocketController.sendFeedback(userId, new WebSocketMessageDTO("CODE_QUALITY_SCORE", null, score));
+
+                    feedbackWebSocketController.sendFeedback(
+                            userId,
+                            new WebSocketMessageDTO("CODE_QUALITY_SCORE", null, score)
+                    );
+
                     return score;
                 });
-
     }
-    public Mono<String> explainCodeQuality(String problemDescription, String code, Long userId) {
-        String prompt = """
-        Kullanıcıya puan vermeden,
-        Aşağıdaki Java kodunda temiz kod prensiplerine uygun olup olmadıgını kontrol et.
-        Temiz kod prensiplerine göre hangi alanlar geliştirilebilir, kısa ve yapıcı şekilde belirtin.
-        public class UserSolution{
-        public static void main(String[] args) throws Exception {
-        Yukarıdaki gibi sınıf yapısı zaten tanımlı, bunu değerlendirmeye katma. Bunu veren benim.
-        Maddeler yazarken * gibi ifadeler kullanma.
 
-        Problem Tanımı:
-        %s
-        Kod:
-        %s
-        """.formatted(problemDescription, code);
+    public Mono<String> explainCodeQuality(String problemDescription, String code, String language, Long userId) {
+        language = language != null ? language.toLowerCase() : "java";
+
+        String systemMessage = switch (language) {
+            case "python" -> "Sen deneyimli bir Python code reviewer’sın. Açıklayıcı ancak kısa yaz.";
+            default -> "Sen deneyimli bir Java code reviewer’sın. Açıklayıcı ancak kısa yaz.";
+        };
+
+        String langPrompt = switch (language) {
+            case "python" -> """
+            Kullanıcıya puan vermeden,
+            Aşağıdaki Python kodunu temiz kod prensiplerine göre değerlendir.
+            Hangi alanlar geliştirilebilir, kısa ve yapıcı bir şekilde açıkla.
+            Lütfen maddelendirme yaparken * veya - kullanma.
+
+            Problem Tanımı:
+            %s
+            Kod:
+            %s
+            """;
+
+            default -> """
+            Kullanıcıya puan vermeden,
+            Aşağıdaki Java kodunda temiz kod prensiplerine uygun olup olmadıgını kontrol et.
+            Temiz kod prensiplerine göre hangi alanlar geliştirilebilir, kısa ve yapıcı şekilde belirtin.
+            public class UserSolution{
+            public static void main(String[] args) throws Exception {
+            Yukarıdaki gibi sınıf yapısı zaten tanımlı, bunu değerlendirmeye katma. Bunu veren benim.
+            Maddeler yazarken * gibi ifadeler kullanma.
+
+            Problem Tanımı:
+            %s
+            Kod:
+            %s
+            """;
+        };
+
+        String prompt = langPrompt.formatted(problemDescription, code);
 
         return webClientBuilder.build()
                 .post()
@@ -148,8 +206,8 @@ public class LLMFeedbackService {
                         "model", "deepseek-coder",
                         "max_tokens", 750,
                         "temperature", 0.2,
-                        "messages", new Object[]{
-                                Map.of("role", "system", "content", "Sen deneyimli bir Java code reviewer’sın. Açıklayıcı ancak kısa yaz."),
+                        "messages", new Object[] {
+                                Map.of("role", "system", "content", systemMessage),
                                 Map.of("role", "user", "content", prompt)
                         }
                 ))
@@ -164,4 +222,5 @@ public class LLMFeedbackService {
                     return feedback;
                 });
     }
+
 }

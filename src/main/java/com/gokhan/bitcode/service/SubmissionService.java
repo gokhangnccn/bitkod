@@ -49,13 +49,13 @@ public class SubmissionService {
             submission.setUserId(Long.valueOf(userClaims.getUserId()));
             submission.setSubmittedAt(LocalDateTime.now());
 
+
             ProblemEntity problem = problemRepository.findById(submission.getProblemId()).orElse(null);
             if (problem == null) {
                 return ApiResponse.problemNotFound();
             }
 
-            CompletableFuture<Boolean> future = codeExecutionService.executeAndEvaluateCode(submission, problem);
-            Boolean passed = future.get();
+            Boolean passed = codeExecutionService.executeAndEvaluateCode(submission, problem).get();
             submission.setPassed(passed);
             SubmissionEntity saved = submissionRepository.save(submission);
 
@@ -70,7 +70,6 @@ public class SubmissionService {
                 // LLM kuyruğuna gönder
                 llmFeedbackQueueProducer.enqueue(task);
             }
-
             return ApiResponse.success(saved);
         } catch (Exception e) {
             return ApiResponse.badRequest("BIT-3001", "Submission kaydedilirken bir hata oluştu: " + e.getMessage());

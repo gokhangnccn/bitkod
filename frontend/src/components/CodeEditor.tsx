@@ -3,6 +3,7 @@ import { EditorView, basicSetup } from "codemirror";
 import { java } from "@codemirror/lang-java";
 import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
+import { autocompletion } from "@codemirror/autocomplete";
 
 interface CodeEditorProps {
     value: string;
@@ -32,6 +33,7 @@ export default function CodeEditor({ value, onChange, language }: CodeEditorProp
                 basicSetup,
                 languageExtension,
                 oneDark,
+                autocompletion(),
                 EditorView.updateListener.of((update) => {
                     if (update.docChanged) {
                         const newValue = update.state.doc.toString();
@@ -45,7 +47,7 @@ export default function CodeEditor({ value, onChange, language }: CodeEditorProp
             viewRef.current?.destroy();
             viewRef.current = null;
         };
-    }, [language]); // ❗️ only recreate editor when language changes
+    }, [language]);
 
     return (
         <div

@@ -6,25 +6,20 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, AlertCircle } from 'lucide-react';
 import { api } from '../api/axios';
+import {toast} from "sonner";
+import { usernameSchema, emailSchema, validationFieldsSchema } from "../utils/validationFields.ts";
 
-const registerSchema = z.object({
-  username: z.string()
-      .min(4, 'Kullanıcı adınız en az 4 karakterden oluşmalı')
-      .max(16, 'Kullanıcı adınız en fazal 16 karakter olabilir')
-      .regex(/^[a-zA-Z0-9_-]+$/, 'Kullanıcı adınız sadece şunları içerebilir: harfler, sayılar, özel karakterler'),
-  email: z.string().email('Geçersiz e-mail adresi'),
-  password: z.string()
-      .min(8, 'Şifreniz en az 8 karakter olmalı')
-      .regex(/[A-Z]/, 'Şifreniz en az 1 büyük harf içermeli')
-      .regex(/[a-z]/, 'Şifreniz en az 1 küçük harf içermeli')
-      .regex(/[0-9]/, 'Şifreniz en az 1 sayı içermeli'),
+export const registerSchema = z.object({
+  username: usernameSchema,
+  email: emailSchema,
+  password: validationFieldsSchema,
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Şifreleriniz eşleşmiyor",
-  path: ["confirmPassword"],
+  path: ["confirmPassword"]
 });
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function Register() {
   const navigate = useNavigate();
@@ -36,7 +31,7 @@ export function Register() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
+  } = useForm({
     resolver: zodResolver(registerSchema),
   });
 
@@ -47,21 +42,29 @@ export function Register() {
       const response = await api.post('/auth/register', data);
 
       if (response.data.IsSucceeded) {
-        await login(response.data.Data.token);
-        navigate('/');
+        const token = response.data.Data?.token;
+
+        if (token) {
+          await login(token);
+          navigate('/');
+        } else {
+          toast.success("Lütfen e-posta adresinizi kontrol ederek hesabınızı doğrulayın.");
+          navigate('/login');
+        }
       } else {
-        setError(response.data.Message || 'Kayıt işlemi başarısız');
+        toast.error(response.data.Message || "Kayıt başarısız oldu.");
       }
     } catch (error: any) {
       setError(
           error.response?.data?.Message ||
           error.response?.data?.message ||
-          'An error occurred during registration'
+          'Bir hata oluştu.'
       );
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-zinc-900 transition-colors duration-300">
@@ -174,6 +177,21 @@ export function Register() {
               </button>
             </div>
           </form>
+          {/* Google ile Kayıt Ol */ }
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">veya</p>
+            <a
+                href="http://localhost:8040/oauth2/authorization/google"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-sm font-medium text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-600 transition-colors"
+            >
+              <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google Logo"
+                  className="w-5 h-5 mr-2"
+              />
+              Google ile Kayıt Ol
+            </a>
+          </div>
         </div>
       </div>
   );
