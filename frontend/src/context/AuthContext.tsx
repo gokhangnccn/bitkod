@@ -5,11 +5,13 @@ interface User {
   id: string;
   email: string;
   username: string;
+  role: string;
 }
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean;
   login: (token: string) => Promise<void>;
   logout: () => void;
 }
@@ -19,16 +21,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
+      setLoading(true);
       fetchUser(token);
+    } else {
+      setLoading(false);
     }
   }, []);
 
   const fetchUser = async (token: string) => {
     try {
+      setLoading(true);
       const response = await api.get('/auth/me');
       if (response.data.IsSucceeded) {
         setUser(response.data.Data);
@@ -39,6 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error fetching user:', error);
       logout();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,10 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
+    setLoading(false);
   };
 
   return (
-      <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+      <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
         {children}
       </AuthContext.Provider>
   );

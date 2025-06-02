@@ -181,7 +181,7 @@ export function Register() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">veya</p>
             <a
-                href="http://localhost:8040/oauth2/authorization/google"
+                href="https://api.bitkod.org/oauth2/authorization/google"
                 className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-sm font-medium text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-600 transition-colors"
             >
               <img

@@ -28,15 +28,11 @@ public class AuthController {
     private final UserRepository userRepository;
     private final VerificationTokenRepository tokenRepository;
 
-    private final EmailService emailService;
 
-    private final String frontendUrl = "http://localhost:3000";
-
-    public AuthController(AuthService authService, UserRepository userRepository, VerificationTokenRepository tokenRepository, EmailService emailService) {
+    public AuthController(AuthService authService, UserRepository userRepository, VerificationTokenRepository tokenRepository) {
         this.authService = authService;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
-        this.emailService = emailService;
     }
 
     @PostMapping("/register")

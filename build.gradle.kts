@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.gokhan"
-version = "0.1.3"
+version = "0.2.1"
 
 java {
 	toolchain {
@@ -37,6 +37,12 @@ dependencies {
 
 	// web socket
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+	//health actuator
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+	// kubernetes client
+	implementation("io.fabric8:kubernetes-client:6.11.0")
 
 	// security + jwt
 	implementation("org.springframework.boot:spring-boot-starter-security")

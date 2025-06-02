@@ -24,7 +24,6 @@ export class WebSocketService {
         this.stompClient.connect(
             {},
             () => {
-                console.log('WebSocket connected');
                 onConnect?.();
             },
             (error) => {

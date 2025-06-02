@@ -25,6 +25,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(nullable = true)
     private String passwordHash;
 
     private String provider; // "GOOGLE", "LOCAL"
@@ -36,7 +37,6 @@ public class UserEntity {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
     private boolean enabled = false;
 
     public String getPassword() {

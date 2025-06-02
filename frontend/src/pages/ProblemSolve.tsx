@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, AlertCircle, CheckCircle, XCircle, Bot, Clock, HardDrive, FileText, Code, Terminal, Award, Flag } from 'lucide-react';
+import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/axios';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { ReportProblemForm } from '../components/ReportProblemForm';
-import CodeEditor from '../components/CodeEditor.tsx';
+import CodeEditor from '../components/EnhancedCodeEditor';
 
 
 interface Problem {
@@ -58,6 +59,13 @@ export function ProblemSolve() {
     const code = language === 'JAVA' ? javaCode : pythonCode;
     const [isCodeChanged, setIsCodeChanged] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+    const [refactorResult, setRefactorResult] = useState<string | null>(null);
+
+    // Refs to prevent rapid multiple clicks
+    const isWhyRequestInProgress = useRef(false);
+    const isRefactorRequestInProgress = useRef(false);
+
     const handleCodeChange = (updatedCode: string) => {
         if (language === 'JAVA') {
             setJavaCode(updatedCode);
@@ -65,7 +73,6 @@ export function ProblemSolve() {
             setPythonCode(updatedCode);
         }
         setIsCodeChanged(true);
-        console.log('isCodeChanged set to true');
     };
 
     useEffect(() => {
@@ -88,7 +95,6 @@ export function ProblemSolve() {
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            console.log('handleBeforeUnload triggered. isCodeChanged:', isCodeChanged);
             if (isCodeChanged) {
                 e.preventDefault();
                 e.returnValue = '';
@@ -153,6 +159,10 @@ export function ProblemSolve() {
             setCodeQualityReason(data.feedback);
             setIsRequestingWhy(false);
         }
+
+        if (data?.type === 'CODE_REFACTOR') {
+            setRefactorResult(data.feedback);
+        }
     }, []);
 
     useWebSocket(userId, handleWebSocketMessage);
@@ -171,7 +181,6 @@ export function ProblemSolve() {
                 code: currentCode,
                 language,
             });
-
             if (response.data.IsSucceeded) {
                 const submission = response.data.Data;
                 setResult(submission);
@@ -211,6 +220,47 @@ export function ProblemSolve() {
         }
     };
 
+    // Prevent multiple rapid clicks on "Neden?" button
+    const handleWhyClick = async () => {
+        if (!result?.id || reasonRequested || isWhyRequestInProgress.current) return;
+
+        isWhyRequestInProgress.current = true;
+        setIsRequestingWhy(true);
+
+        const success = await requestCodeQualityReason();
+
+        if (success) {
+            setReasonRequested(true);
+            setShowReasonModal(true);
+        }
+
+        isWhyRequestInProgress.current = false;
+    };
+
+    const handleRefactorClick = async () => {
+        if (!result?.id || loading || isRefactorRequestInProgress.current) return;
+
+        isRefactorRequestInProgress.current = true;
+        setLoading(true);
+
+        try {
+            const response = await api.post(`/llm-feedback/${result.id}/refactor`);
+            if (response.status === 200) {
+                alert("Kod iyileştirme görevi kuyruğa eklendi! Lütfen sonucu bekleyin.");
+            }
+        } catch (error) {
+            console.error("Kod iyileştirme sırasında hata oluştu:", error);
+            alert("Kod iyileştirme isteği başarısız oldu.");
+        } finally {
+            setLoading(false);
+            isRefactorRequestInProgress.current = false;
+        }
+    };
+
+    const InlineSpinner = (
+        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+    );
+
     if (error) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center px-4">
@@ -231,9 +281,16 @@ export function ProblemSolve() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 transition-colors duration-300 relative">
+        <>
+        {isSubmitting && (
+            <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center">
+                <Loader message="Çalıştırılıyor..."/>
+            </div>
+        )}
 
-            {/* Success Modal */}
+            <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-8 transition-colors duration-300 relative">
+
+                {/* Success Modal */}
             {showPassedModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg max-w-md w-full text-center transform transition-all">
@@ -261,7 +318,7 @@ export function ProblemSolve() {
                                     Problemi başarıyla çözdünüz. Kod kalitesi puanınız hazırlanıyor...
                                 </p>
                                 <div className="w-full flex justify-center">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
+                                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent"></div>
                                 </div>
                             </>
                         )}
@@ -447,20 +504,16 @@ export function ProblemSolve() {
                                                 <span className="font-medium">{result.codeQualityScore} / 100</span>
                                                 {result.codeQualityScore < 100 && (
                                                     <button
-                                                        onClick={async () => {
-                                                            if (!result?.id || reasonRequested) return;
-                                                            setIsRequestingWhy(true);
-                                                            const success = await requestCodeQualityReason();
-                                                            if (success) {
-                                                                setReasonRequested(true);
-                                                                setShowReasonModal(true);
-                                                            }
-                                                        }}
+                                                        onClick={handleWhyClick}
                                                         disabled={isRequestingWhy || reasonRequested}
                                                         className="flex items-center gap-2 bg-indigo-100 dark:bg-zinc-700 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-lg shadow hover:bg-indigo-200 dark:hover:bg-zinc-600 disabled:opacity-50 text-sm font-medium transition-colors"
                                                     >
                                                         <Bot className="w-4 h-4"/>
-                                                        {isRequestingWhy ? 'Gönderiliyor...' : 'Neden?'}
+                                                        {isRequestingWhy ? (
+                                                            <>
+                                                                {InlineSpinner} Gönderiliyor...
+                                                            </>
+                                                        ) : 'Neden?'}
                                                     </button>
                                                 )}
                                             </div>
@@ -470,8 +523,33 @@ export function ProblemSolve() {
                                                     {codeQualityReason}
                                                 </div>
                                             )}
+                                            <button
+                                                onClick={handleRefactorClick}
+                                                disabled={loading}
+                                                className="mt-4 flex items-center gap-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg shadow transition-colors"
+                                            >
+                                                <Bot className="w-4 h-4" />
+                                                {loading ? (
+                                                    <>
+                                                        {InlineSpinner} Gönderiliyor...
+                                                    </>
+                                                ) : 'Kodu İyileştir'}
+                                            </button>
+
+                                            {refactorResult && (
+                                                <div className="mt-4 bg-purple-50 dark:bg-purple-900/10 rounded-lg p-4">
+                                                    <h3 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2">
+                                                        <Bot className="w-4 h-4" />
+                                                        İyileştirilmiş Kod
+                                                    </h3>
+                                                    <pre className="text-sm text-purple-800 dark:text-purple-300 font-mono whitespace-pre-wrap">
+                                                {refactorResult}
+                                                        </pre>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
+
                                 </div>
                             </div>
                         )}
@@ -544,5 +622,6 @@ export function ProblemSolve() {
                 </div>
             )}
         </div>
+        </>
     );
 }

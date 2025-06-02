@@ -64,4 +64,32 @@ public class LLMFeedbackController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/{submissionId}/refactor")
+    public ResponseEntity<?> generateRefactoredCode(
+            @PathVariable Long submissionId
+    ) {
+        return submissionRepository.findById(submissionId)
+                .map(submission -> {
+                    ProblemEntity problem = problemRepository.findById(submission.getProblemId()).orElse(null);
+                    if (problem == null) {
+                        return ResponseEntity.badRequest().body("Problem bulunamadı.");
+                    }
+                    if (submission.getRefactoredCode() != null) {
+                        return ResponseEntity.badRequest().body("Bu kod zaten refactor edilmiş!");
+                    }
+
+                    FeedbackTask task = new FeedbackTask(
+                            submission.getId(),
+                            problem.getDescription(),
+                            submission.getCode(),
+                            submission.getErrorMessage(),
+                            FeedbackType.CODE_REFACTOR
+                    );
+
+                    llmFeedbackQueueProducer.enqueue(task);
+                    return ResponseEntity.ok("LLM refactor görevi kuyruğa eklendi.");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

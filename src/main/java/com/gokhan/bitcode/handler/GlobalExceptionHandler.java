@@ -1,12 +1,12 @@
 package com.gokhan.bitcode.handler;
 
 import com.gokhan.bitcode.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,8 +31,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleAllOther(Exception ex) {
+    public ResponseEntity<ApiResponse<Object>> handleAllOther(HttpServletRequest request, Exception ex) {
+        // /actuator/health isteği geldiyse bu handler'ı atla
+        if ("/actuator/health".equals(request.getRequestURI())) {
+            return null; // Spring default actuator yanıtını versin (200 OK)
+        }
         ex.printStackTrace();
-        return ResponseEntity.internalServerError().body(ApiResponse.serverError("BIT-500", "Bilinmeyen bir hata oluştu."));
+        return ResponseEntity.internalServerError()
+                .body(ApiResponse.serverError("BIT-500", "Bilinmeyen bir hata oluştu."));
     }
 }

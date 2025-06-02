@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../api/axios';
 import {
     User,
@@ -6,6 +6,10 @@ import {
     CheckCircle2,
     BookOpen,
     Percent,
+    Pencil,
+    Check as CheckIcon,
+    X as XIcon,
+    Loader2,
 } from 'lucide-react';
 import AdvancedModal from '../components/AdvancedModal';
 import { UserCharts } from '../components/UserCharts';
@@ -34,6 +38,33 @@ const AccountPage = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const [editingUsername, setEditingUsername] = useState(false);
+    const [newUsername, setNewUsername] = useState('');
+    const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+    const [availabilityLoading, setAvailabilityLoading] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const [usernameError, setUsernameError] = useState<string | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const canSave = !usernameError && usernameAvailable && !updateLoading;
+
+    useEffect(() => {
+        if (editingUsername) {
+            setTimeout(() => inputRef.current?.focus(), 50);
+        }
+    }, [editingUsername]);
+
+    const IconButton = ({ icon: Icon, onClick, disabled=false, ariaLabel='' }: { icon: any; onClick: ()=>void; disabled?: boolean; ariaLabel?: string; }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            aria-label={ariaLabel}
+            className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+            <Icon className="h-4 w-4" />
+        </button>
+    );
 
     useEffect(() => {
         const fetchData = async () => {
@@ -45,15 +76,12 @@ const AccountPage = () => {
                 }
 
                 const userId = userRes.data.Data.userId;
-                console.log('User ID:', userId); // Debug için
 
                 // Kullanıcı profilini al
                 const profileRes = await api.get(`/users/${userId}`);
                 if (!profileRes.data.IsSucceeded) {
                     throw new Error(profileRes.data.Message || 'Profil bilgisi alınamadı');
                 }
-
-                console.log('Profile Response:', profileRes.data); // Debug için
 
                 // Tarih formatını düzelt
                 const createdAt = profileRes.data.Data.createdAt
@@ -72,8 +100,6 @@ const AccountPage = () => {
                 if (!statsRes.data.IsSucceeded) {
                     throw new Error(statsRes.data.Message || 'İstatistikler alınamadı');
                 }
-
-                console.log('Stats Response:', statsRes.data); // Debug için
 
                 // İstatistik verilerini düzenle
                 const statsData = statsRes.data.Data;
@@ -115,6 +141,85 @@ const AccountPage = () => {
         </div>
     );
 
+    const handleUsernameUpdate = async () => {
+        if (!profile) return;
+
+        setUpdateLoading(true);
+        try {
+            const res = await api.put(`/users/${profile.userId}/username`, { username: newUsername });
+            if (res.data.IsSucceeded) {
+                setProfile(prev => ({ ...prev!, username: newUsername }));
+                setEditingUsername(false);
+            } else {
+                throw new Error(res.data.Message || 'Kullanıcı adı güncellenirken bir hata oluştu');
+            }
+        } catch (err: any) {
+            console.error('Error updating username:', err);
+            setError(err.response?.data?.Message || err.message || 'Kullanıcı adı güncellenirken bir hata oluştu');
+            setShowModal(true);
+        } finally {
+            setUpdateLoading(false);
+        }
+    };
+
+    const validateUsernameLocal = (value: string): string | null => {
+        if (!value) {
+            return 'Kullanıcı adı boş olamaz.';
+        }
+        if (value.length < 3 || value.length > 20) {
+            return 'Kullanıcı adı 3-20 karakter olmalıdır.';
+        }
+        if (/[^a-z0-9_]/.test(value)) {
+            return 'Sadece küçük harf, rakam ve alt çizgi(_) kullanabilirsiniz.';
+        }
+        return null;
+    };
+
+    const checkUsernameAvailability = async () => {
+        const localErr = validateUsernameLocal(newUsername);
+        if (localErr) {
+            setUsernameError(localErr);
+            setUsernameAvailable(false);
+            return;
+        }
+        if (!newUsername || newUsername === profile?.username) return;
+        setAvailabilityLoading(true);
+        try {
+            const res = await api.get(`/users/check-username`, { params: { username: newUsername } });
+            if (res.data.IsSucceeded) {
+                setUsernameAvailable(true);
+                setUsernameError(null);
+            } else {
+                setUsernameAvailable(false);
+                setUsernameError('Kullanıcı adı kullanımda.');
+            }
+        } catch (err: any) {
+            console.error('Error checking username availability:', err);
+            setUsernameAvailable(false);
+            setUsernameError('Kullanıcı adı kontrol edilirken bir hata oluştu');
+        } finally {
+            setAvailabilityLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!editingUsername) return;
+
+        const localErr = validateUsernameLocal(newUsername);
+        setUsernameError(localErr);
+        if (localErr) {
+            setUsernameAvailable(false);
+            return;
+        }
+        const handler = setTimeout(() => {
+            checkUsernameAvailability();
+        }, 2000);
+        return () => {
+            clearTimeout(handler);
+            setAvailabilityLoading(false);
+        };
+    }, [newUsername]);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800 transition-colors duration-300 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -141,8 +246,62 @@ const AccountPage = () => {
                     {profile && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                             <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Kullanıcı Adı</p>
-                                <p className="text-lg font-semibold text-gray-800 dark:text-white">{profile.username}</p>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Kullanıcı Adı
+                                </p>
+                                {!editingUsername ? (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg font-semibold text-gray-800 dark:text-white">
+                                            {profile.username}
+                                        </span>
+                                        <Pencil
+                                            className="h-4 w-4 cursor-pointer hover:text-indigo-600"
+                                            onClick={() => {
+                                                setEditingUsername(true);
+                                                setNewUsername(profile!.username);
+                                                setUsernameAvailable(null);
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="relative w-full max-w-xs">
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={newUsername}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setNewUsername(val);
+                                                const err = validateUsernameLocal(val);
+                                                setUsernameError(err);
+                                                setUsernameAvailable(err ? false : null);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && canSave) {
+                                                    handleUsernameUpdate();
+                                                }
+                                                if (e.key === 'Escape') {
+                                                    setEditingUsername(false);
+                                                }
+                                            }}
+                                            className={`w-full border rounded px-2 py-1 pr-16 dark:bg-zinc-800 dark:border-zinc-600 dark:text-white transition-colors ${usernameError ? 'border-red-500' : usernameAvailable ? 'border-green-500' : ''}`}
+                                        />
+                                        <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
+                                            {availabilityLoading && <Loader2 className="animate-spin h-4 w-4" />}
+                                            {!availabilityLoading && (
+                                                <>
+                                                    <IconButton icon={CheckIcon} ariaLabel="Kaydet" disabled={!canSave} onClick={handleUsernameUpdate} />
+                                                    <IconButton icon={XIcon} ariaLabel="İptal" onClick={() => setEditingUsername(false)} />
+                                                </>
+                                            )}
+                                        </div>
+                                        {usernameError && (
+                                            <p role="alert" className="mt-1 text-sm text-red-500 absolute left-0 top-full">
+                                                {usernameError}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">E-posta</p>

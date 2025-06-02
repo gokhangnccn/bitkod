@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ProblemReport, ReportCategoryLabels, ReportStatus, ReportStatusLabels } from '../types/problem';
 import { problemReportService } from '../services/problemReportService';
 import { AlertCircle, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import Loader from '../../components/Loader';
 
 export function ProblemReportList() {
     const [reports, setReports] = useState<ProblemReport[]>([]);
@@ -60,7 +61,7 @@ export function ProblemReportList() {
     };
 
     if (loading) {
-        return <div className="text-center py-4">Yükleniyor...</div>;
+        return <Loader fullHeight />;
     }
 
     if (error) {

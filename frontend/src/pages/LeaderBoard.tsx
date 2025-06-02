@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../api/axios';
 import { BarChart3, User, BookOpen, Percent, BarChart2, Star } from 'lucide-react';
 import AdvancedModal from '../components/AdvancedModal';
+import Loader from "../components/Loader.tsx";
 
 interface UserStats {
     userId: number;
@@ -44,7 +45,7 @@ export default function Leaderboard() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center text-gray-600 dark:text-gray-300 py-8">Yükleniyor...</div>
+                    <Loader fullHeight />
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200">
