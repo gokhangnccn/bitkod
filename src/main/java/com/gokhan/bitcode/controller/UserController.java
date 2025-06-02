@@ -2,6 +2,7 @@ package com.gokhan.bitcode.controller;
 
 import com.gokhan.bitcode.ApiResponse;
 import com.gokhan.bitcode.dtos.UserProfileDTO;
+import com.gokhan.bitcode.dtos.UsernameUpdateDTO;
 import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.service.UserService;
 import com.gokhan.bitcode.utils.UserClaims;
@@ -39,5 +40,18 @@ public class UserController {
                                                         Authentication authentication) {
         UserClaims userClaims = (UserClaims) authentication.getPrincipal();
         return ResponseEntity.ok(userService.deleteUserById(id, userClaims));
+    }
+
+    @PutMapping("/{id}/username")
+    public ResponseEntity<ApiResponse<UserProfileDTO>> updateUsername(@PathVariable Long id,
+                                                                      @RequestBody UsernameUpdateDTO usernameUpdateDTO,
+                                                                      Authentication authentication) {
+        UserClaims userClaims = (UserClaims) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateUsername(id, usernameUpdateDTO.username(), userClaims));
+    }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<ApiResponse<Boolean>> checkUsernameAvailability(@RequestParam String username) {
+        return ResponseEntity.ok(userService.isUsernameAvailable(username));
     }
 }

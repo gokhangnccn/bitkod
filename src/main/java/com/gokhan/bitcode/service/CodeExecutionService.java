@@ -4,28 +4,37 @@ import com.gokhan.bitcode.entity.ProblemEntity;
 import com.gokhan.bitcode.entity.SubmissionEntity;
 import com.gokhan.bitcode.entity.TestCaseEntity;
 import com.gokhan.bitcode.repository.TestCaseRepository;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CodeExecutionService {
 
     private final TestCaseRepository testCaseRepository;
-    private final String javaDockerImage = "java-runner";
-    private final String pythonDockerImage = "python-runner";
+    private final String javaDockerImage = "gokhangnccn/java-runner:latest";
+    private final String pythonDockerImage = "gokhangnccn/python-runner:latest";
+    private final KubernetesClient kubernetesClient;
 
     @Async("codeRunnerExecutor")
     public CompletableFuture<Boolean> executeAndEvaluateCode(SubmissionEntity submission, ProblemEntity problem) {
@@ -40,7 +49,7 @@ public class CodeExecutionService {
         language = language.toLowerCase();
 
         String uniqueId = UUID.randomUUID().toString();
-        Path folderPath = Path.of(System.getProperty("java.io.tmpdir"), "runner", uniqueId);
+        Path folderPath = Path.of("/opt/runner", uniqueId);
         String fileName;
         String codeToExecute;
 
@@ -64,30 +73,45 @@ public class CodeExecutionService {
                 }
             }
 
+            // Kod dosyasını yaz
             Files.writeString(folderPath.resolve(fileName), codeToExecute, StandardCharsets.UTF_8);
 
-            for (TestCaseEntity testCase : testCases) {
-                String input = testCase.getInput();
-                String expectedOutput = testCase.getExpectedOutput();
-                String output;
+            // Dosya yazma işleminin tamamlanmasını bekle
+            Thread.sleep(1000);
 
-                try {
-                    output = switch (language) {
-                        case "java" -> runJavaInDocker(folderPath.toString(), input);
-                        case "python" -> runPythonInDocker(folderPath.toString(), input, fileName);
-                        default -> throw new IllegalStateException("Beklenmedik dil: " + language);
-                    };
-                } catch (Exception e) {
-                    submission.setPassed(false);
-                    submission.setErrorMessage("Çalıştırma hatası: " + e.getMessage());
-                    cleanup(folderPath);
-                    return CompletableFuture.completedFuture(false);
-                }
+            // Dosyanın gerçekten yazıldığını kontrol et
+            if (!Files.exists(folderPath.resolve(fileName))) {
+                log.error("File was not created: {}", folderPath.resolve(fileName));
+                throw new RuntimeException("Kod dosyası oluşturulamadı");
+            }
+            
+            log.info("Code file created successfully: {}", folderPath.resolve(fileName));
 
+            List<String> outputs;
+            try {
+                outputs = runCodeInKubernetes(language, folderPath, fileName, testCases);
+            } catch (Exception e) {
+                log.error("Code execution failed for submission {}: {}", submission.getId(), e.getMessage());
+                submission.setPassed(false);
+                submission.setErrorMessage("Çalıştırma hatası: " + e.getMessage());
+                cleanup(folderPath);
+                return CompletableFuture.completedFuture(false);
+            }
+
+            if (outputs.size() != testCases.size()) {
+                submission.setPassed(false);
+                submission.setErrorMessage("Test çıktısı sayısı beklenenden farklı. Beklenen: " + testCases.size() + ", Alınan: " + outputs.size());
+                cleanup(folderPath);
+                return CompletableFuture.completedFuture(false);
+            }
+
+            for (int i = 0; i < testCases.size(); i++) {
+                String expectedOutput = testCases.get(i).getExpectedOutput();
+                String output = outputs.get(i);
                 if (!normalize(output).equals(normalize(expectedOutput))) {
                     submission.setPassed(false);
                     submission.setOutput(output);
-                    submission.setErrorMessage("Beklenen çıktı ile eşleşmedi.");
+                    submission.setErrorMessage("Beklenen çıktı ile eşleşmedi. Aldığınız: " + normalize(output) + ", Beklenen: " + normalize(expectedOutput));
                     cleanup(folderPath);
                     return CompletableFuture.completedFuture(false);
                 }
@@ -97,9 +121,10 @@ public class CodeExecutionService {
             submission.setOutput("Tüm testler başarıyla geçti.");
             return CompletableFuture.completedFuture(true);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+            log.error("Execution failed: ", e);
             submission.setPassed(false);
-            submission.setErrorMessage("Dosya sistemi hatası: " + e.getMessage());
+            submission.setErrorMessage("Sistem hatası: " + e.getMessage());
             return CompletableFuture.completedFuture(false);
         } finally {
             cleanup(folderPath);
@@ -117,57 +142,243 @@ public class CodeExecutionService {
                 """, className, code);
     }
 
-    private String runJavaInDocker(String hostFolderPath, String input) throws IOException, InterruptedException {
-        String command = "cd /app && javac UserSolution.java && java UserSolution";
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "run", "-i", "--rm",
-                "--memory=256m", "--cpus=0.5", "--network=none",
-                "-v", hostFolderPath + ":/app",
-                javaDockerImage,
-                "bash", "-c", command
-        );
-        return executeInDocker(pb, input);
-    }
+    private List<String> runCodeInKubernetes(String language, Path folderPath, String fileName, List<TestCaseEntity> testCases) throws Exception {
+        // Tüm test girdilerini ayrı dosyalara yaz
+        for (int i = 0; i < testCases.size(); i++) {
+            Files.writeString(folderPath.resolve("input_" + i + ".txt"), testCases.get(i).getInput(), StandardCharsets.UTF_8);
+        }
 
-    private String runPythonInDocker(String hostFolderPath, String input, String scriptName) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "run", "-i", "--rm",
-                "--memory=256m", "--cpus=0.5", "--network=none",
-                "-v", hostFolderPath + ":/app",
-                pythonDockerImage,
-                "python3", "/app/" + scriptName
-        );
-        return executeInDocker(pb, input);
-    }
+        // Dosyaların hazır olmasını bekle
+        log.info("Waiting for files to be available in volume: {}", folderPath);
+        int retryCount = 0;
+        while ((!Files.exists(folderPath.resolve("input_0.txt")) || !Files.exists(folderPath.resolve(fileName))) && retryCount < 20) {
+            Thread.sleep(500);
+            retryCount++;
+        }
 
-    private String executeInDocker(ProcessBuilder pb, String stdInput) throws IOException, InterruptedException {
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
+        if (retryCount >= 20) {
+            throw new RuntimeException("Dosyalar oluşturulamadı");
+        }
 
-        if (stdInput != null) {
-            try (OutputStream os = process.getOutputStream()) {
-                os.write(stdInput.getBytes(StandardCharsets.UTF_8));
-                if (!stdInput.endsWith("\n")) {
-                    os.write("\n".getBytes(StandardCharsets.UTF_8));
+        // Volume senkronizasyonu için küçük bekleme
+        Thread.sleep(1000);
+
+        String jobName = language + "-runner-job-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8);
+        String imageName = language.equals("java") ? javaDockerImage : pythonDockerImage;
+        String uuidFolder = folderPath.getFileName().toString();
+
+        final String delimiter = "---END---";
+
+        String runCommand = language.equals("java")
+                ? String.format(
+                "cd /opt/runner/%s && " +
+                        "javac %s && " +
+                        "for f in input_*.txt; do java UserSolution < \"$f\"; echo '%s'; done",
+                uuidFolder, fileName, delimiter)
+                : String.format(
+                "cd /opt/runner/%s && " +
+                        "for f in input_*.txt; do python3 %s < \"$f\"; echo '%s'; done",
+                uuidFolder, fileName, delimiter);
+
+        Job job = new JobBuilder()
+                .withNewMetadata()
+                .withName(jobName)
+                .addToLabels("app", "code-runner")
+                .addToLabels("session-id", uuidFolder)
+                .endMetadata()
+                .withNewSpec()
+                .withBackoffLimit(0) // Yeniden deneme yapma
+                .withTtlSecondsAfterFinished(300) // 5 dakika sonra otomatik temizle
+                .withNewTemplate()
+                .withNewMetadata()
+                .addToLabels("app", "code-runner")
+                .addToLabels("session-id", uuidFolder)
+                .endMetadata()
+                .withNewSpec()
+                .withNodeName("gke-bitkod-cluster-ssd-pool-d34b4444-99m4")
+                .addNewInitContainer()
+                .withName("fix-permissions")
+                .withImage("busybox:1.35")
+                .withCommand("sh", "-c", "mkdir -p /opt/runner/" + uuidFolder + " && chown -R 1000:1000 /opt/runner/" + uuidFolder)
+                .addNewVolumeMount()
+                .withName("code-volume")
+                .withMountPath("/opt/runner")
+                .endVolumeMount()
+                .withNewSecurityContext()
+                .withRunAsUser(0L) // Root olarak çalıştır permission fix için
+                .endSecurityContext()
+                .endInitContainer()
+                .addNewContainer()
+                .withName(language + "-runner")
+                .withImage(imageName)
+                .withCommand("bash", "-c", runCommand)
+                .addNewVolumeMount()
+                .withName("code-volume")
+                .withMountPath("/opt/runner")
+                .endVolumeMount()
+                .withNewResources()
+                .addToLimits("memory", Quantity.parse("256Mi"))
+                .addToLimits("cpu", Quantity.parse("500m"))
+                .addToRequests("memory", Quantity.parse("128Mi"))
+                .addToRequests("cpu", Quantity.parse("100m"))
+                .endResources()
+                .withNewSecurityContext()
+                .withRunAsUser(1000L)
+                .withRunAsGroup(1000L)
+                .endSecurityContext()
+                .endContainer()
+                .withRestartPolicy("Never")
+                .addNewVolume()
+                .withName("code-volume")
+                .withNewPersistentVolumeClaim()
+                .withClaimName("runner-pvc")
+                .endPersistentVolumeClaim()
+                .endVolume()
+                .endSpec()
+                .endTemplate()
+                .endSpec()
+                .build();
+
+        try {
+            kubernetesClient.batch().v1().jobs().inNamespace("default").create(job);
+            log.info("Job created: {}", jobName);
+
+            // Job tamamlanmasını bekle
+            int maxTries = 30; // 30 saniye
+            boolean jobCompleted = false;
+            String failureReason = "";
+
+            for (int i = 0; i < maxTries; i++) {
+                Job currentJob = kubernetesClient.batch().v1().jobs().inNamespace("default").withName(jobName).get();
+                if (currentJob != null && currentJob.getStatus() != null) {
+                    Integer succeeded = currentJob.getStatus().getSucceeded();
+                    Integer failed = currentJob.getStatus().getFailed();
+
+                    if (succeeded != null && succeeded > 0) {
+                        jobCompleted = true;
+                        break;
+                    }
+
+                    if (failed != null && failed > 0) {
+                        // Pod loglarını ve durumunu detaylı olarak al
+                        PodList pods = kubernetesClient.pods()
+                                .inNamespace("default")
+                                .withLabel("job-name", jobName)
+                                .list();
+
+                        StringBuilder errorDetails = new StringBuilder("Job failed. Details:");
+                        
+                        if (!pods.getItems().isEmpty()) {
+                            Pod pod = pods.getItems().get(0);
+                            String podName = pod.getMetadata().getName();
+                            
+                            // Pod durumu
+                            if (pod.getStatus() != null) {
+                                errorDetails.append("\nPod Status: ").append(pod.getStatus().getPhase());
+                                
+                                if (pod.getStatus().getContainerStatuses() != null && !pod.getStatus().getContainerStatuses().isEmpty()) {
+                                    var containerStatus = pod.getStatus().getContainerStatuses().get(0);
+                                    if (containerStatus.getState() != null && containerStatus.getState().getTerminated() != null) {
+                                        errorDetails.append("\nExit Code: ").append(containerStatus.getState().getTerminated().getExitCode());
+                                        errorDetails.append("\nReason: ").append(containerStatus.getState().getTerminated().getReason());
+                                        errorDetails.append("\nMessage: ").append(containerStatus.getState().getTerminated().getMessage());
+                                    }
+                                    if (containerStatus.getState() != null && containerStatus.getState().getWaiting() != null) {
+                                        errorDetails.append("\nWaiting Reason: ").append(containerStatus.getState().getWaiting().getReason());
+                                        errorDetails.append("\nWaiting Message: ").append(containerStatus.getState().getWaiting().getMessage());
+                                    }
+                                }
+                            }
+                            
+                            // Pod logları
+                            try {
+                                String logs = kubernetesClient.pods()
+                                        .inNamespace("default")
+                                        .withName(podName)
+                                        .getLog();
+                                if (logs != null && !logs.trim().isEmpty()) {
+                                    errorDetails.append("\nPod Logs: ").append(logs.trim());
+                                }
+                            } catch (Exception e) {
+                                errorDetails.append("\nCould not retrieve pod logs: ").append(e.getMessage());
+                            }
+                        } else {
+                            errorDetails.append("\nNo pods found for failed job");
+                        }
+                        
+                        log.error("Job execution failed: {}", errorDetails.toString());
+                        throw new RuntimeException(errorDetails.toString());
+                    }
                 }
+                Thread.sleep(1000);
+            }
+
+            if (!jobCompleted) {
+                // Timeout durumunda da detaylı bilgi al
+                PodList pods = kubernetesClient.pods()
+                        .inNamespace("default")
+                        .withLabel("job-name", jobName)
+                        .list();
+                
+                StringBuilder timeoutDetails = new StringBuilder("Job execution timeout. Details:");
+                
+                if (!pods.getItems().isEmpty()) {
+                    Pod pod = pods.getItems().get(0);
+                    if (pod.getStatus() != null) {
+                        timeoutDetails.append("\nPod Status: ").append(pod.getStatus().getPhase());
+                        try {
+                            String logs = kubernetesClient.pods()
+                                    .inNamespace("default")
+                                    .withName(pod.getMetadata().getName())
+                                    .getLog();
+                            if (logs != null && !logs.trim().isEmpty()) {
+                                timeoutDetails.append("\nPod Logs: ").append(logs.trim());
+                            }
+                        } catch (Exception e) {
+                            timeoutDetails.append("\nCould not retrieve pod logs: ").append(e.getMessage());
+                        }
+                    }
+                }
+                
+                log.error("Job timeout: {}", timeoutDetails.toString());
+                throw new RuntimeException(timeoutDetails.toString());
+            }
+
+            // Pod loglarını al
+            PodList pods = kubernetesClient.pods()
+                    .inNamespace("default")
+                    .withLabel("job-name", jobName)
+                    .list();
+
+            if (pods.getItems().isEmpty()) {
+                throw new RuntimeException("No pods found for job: " + jobName);
+            }
+
+            Pod pod = pods.getItems().get(0);
+            String logs = kubernetesClient.pods()
+                    .inNamespace("default")
+                    .withName(pod.getMetadata().getName())
+                    .getLog();
+
+            // Log'u ayrıştır
+            String rawLogs = logs != null ? logs.trim() : "";
+            List<String> outputs = Arrays.stream(rawLogs.split(delimiter))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            return outputs;
+
+        } finally {
+            // Job temizliği
+            try {
+                Thread.sleep(2000); // Logları almak için biraz bekle
+                kubernetesClient.batch().v1().jobs().inNamespace("default").withName(jobName).delete();
+                log.info("Job deleted: {}", jobName);
+            } catch (Exception e) {
+                log.warn("Failed to delete job {}: {}", jobName, e.getMessage());
             }
         }
-
-        long timeoutSeconds = 10;
-        boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
-
-        if (!finished) {
-            process.destroyForcibly();
-            process.waitFor();
-            throw new RuntimeException("Kod çalıştırma zaman aşımına uğradı.");
-        }
-
-        String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
-        if (process.exitValue() != 0) {
-            throw new RuntimeException("Çıkış kodu: " + process.exitValue() + "\nHata çıktısı:\n" + output);
-        }
-
-        return output;
     }
 
     private void cleanup(Path folderPath) {
@@ -178,11 +389,13 @@ public class CodeExecutionService {
                         .forEach(path -> {
                             try {
                                 Files.deleteIfExists(path);
-                            } catch (IOException ignored) {
+                            } catch (IOException e) {
+                                log.warn("Failed to delete file: {}", path, e);
                             }
                         });
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            log.warn("Failed to cleanup folder: {}", folderPath, e);
         }
     }
 

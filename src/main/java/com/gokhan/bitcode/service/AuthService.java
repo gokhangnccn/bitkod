@@ -15,6 +15,7 @@ import com.gokhan.bitcode.utils.JwtService;
 import com.gokhan.bitcode.utils.UserClaims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class AuthService {
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    private final String frontendUrl = "http://localhost:3000";
+    private final String frontendUrl = "https://www.bitkod.org";
 
     public ApiResponse<AuthResponse> register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username()) ||

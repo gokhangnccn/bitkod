@@ -5,6 +5,7 @@ import com.gokhan.bitcode.enums.Role;
 import com.gokhan.bitcode.repository.UserRepository;
 import com.gokhan.bitcode.utils.JwtService;
 import com.gokhan.bitcode.utils.UserClaims;
+import com.gokhan.bitcode.utils.UsernameValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,8 +37,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String name = (String) attributes.get("name");
 
         String baseUsername = generateBaseUsername(name, email);
-        String uniqueUsername = generateUniqueUsername(baseUsername);
-
+        String candidateUsername = generateUniqueUsername(baseUsername);
+        if (!UsernameValidator.isValid(candidateUsername)) {
+            candidateUsername = generateFallbackUsername();
+        }
+        final String uniqueUsername = candidateUsername;
 
         UserEntity user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -52,6 +56,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     return userRepository.save(newUser);
                 });
 
+        // Eğer mevcut kullanıcının kullanıcı adı kurallara uymuyorsa güncelle
+        if (!UsernameValidator.isValid(user.getUsername())) {
+            String fixedUsername = generateUniqueUsername(generateBaseUsername(name, email));
+            if (!UsernameValidator.isValid(fixedUsername)) {
+                fixedUsername = generateFallbackUsername();
+            }
+            user.setUsername(fixedUsername);
+            userRepository.save(user);
+        }
+
         UserClaims claims = new UserClaims(
                 user.getId().toString(),
                 user.getEmail(),
@@ -59,19 +73,40 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         );
         String jwt = jwtService.generateToken(claims);
 
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/oauth2-success?token=" + jwt);
+        System.out.println("OAuth2 Success - Redirecting to: https://www.bitkod.org/oauth2-success?token=" + jwt);
+
+        getRedirectStrategy().sendRedirect(request, response, "https://www.bitkod.org/oauth2-success?token=" + jwt);
     }
 
     private String generateUniqueUsername(String baseUsername) {
-        String username = baseUsername;
+        String sanitized = trimToMaxLength(baseUsername);
+        String username = sanitized;
         int counter = 1;
 
-        while (userRepository.existsByUsername(username)) {
-            username = baseUsername + counter;
+        while (userRepository.existsByUsername(username) || !UsernameValidator.isValid(username)) {
+            String suffix = String.valueOf(counter);
+            int maxBaseLength = 20 - suffix.length();
+            String prefix = sanitized.substring(0, Math.min(sanitized.length(), maxBaseLength));
+            username = prefix + suffix;
             counter++;
         }
 
         return username;
+    }
+
+    private String trimToMaxLength(String input) {
+        if (input.length() > 20) {
+            return input.substring(0, 20);
+        }
+        return input;
+    }
+
+    private String generateFallbackUsername() {
+        String fallback;
+        do {
+            fallback = "user_" + UUID.randomUUID().toString().substring(0, 6);
+        } while (userRepository.existsByUsername(fallback) || !UsernameValidator.isValid(fallback));
+        return fallback;
     }
 
     private String generateBaseUsername(String name, String email) {
@@ -87,11 +122,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .replaceAll("\\s+", "_")
                 .replaceAll("[^a-z0-9_]", "");
 
-        // Minimum 3 karakter zorunluluğu
+        // Min 3 karakter
         if (cleaned.length() < 3) {
             cleaned = "user_" + UUID.randomUUID().toString().substring(0, 6);
         }
 
+        cleaned = trimToMaxLength(cleaned);
         return cleaned;
     }
 

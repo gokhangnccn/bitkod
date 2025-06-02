@@ -31,8 +31,8 @@ public class LLMFeedbackService {
         language = language != null ? language.toLowerCase() : "java";
 
         String systemMessage = switch (language) {
-            case "python" -> "Sen deneyimli bir Python code reviewer’sın. Sadece puanla.";
-            default -> "Sen deneyimli bir Java code reviewer’sın. Sadece puanla.";
+            case "python" -> "Sen deneyimli bir Python code reviewer’sın.";
+            default -> "Sen deneyimli bir Java code reviewer’sın.";
         };
 
         String prompt = """
@@ -45,7 +45,7 @@ public class LLMFeedbackService {
                 Hata:
                 %s
 
-                Lütfen neden hatalı olduğunu açıklayın ve kısaca ipucu ver, çözüm kodunu verme.
+                Lütfen neden hatalı olduğunu açıklayın ve kısaca ipucu ver, çözüm kodunu verme, puanlama yapma, plaintext olarak response ver maddeler veya başlıklar kullanma.
                 """.formatted(problemDescription, code, errorMessage);
 
         return webClientBuilder.build()
@@ -55,7 +55,7 @@ public class LLMFeedbackService {
                 .header("Content-Type", "application/json")
                 .bodyValue(Map.of(
                         "model", "deepseek-coder",
-                        "max_tokens", 200,
+                        "max_tokens", 300,
                         "temperature", 0.3,
                         "messages", new Object[]{
                                 Map.of("role", "system", "content", systemMessage),
@@ -222,5 +222,45 @@ public class LLMFeedbackService {
                     return feedback;
                 });
     }
+
+    public Mono<String> refactorCode(String problemDescription, String code, String language, Long userId) {
+        String systemMessage = switch (language) {
+            case "python" -> "Sen deneyimli bir Python yazılım geliştiricisisin. Kullanıcının kodunu temiz kod ilkelerine göre iyileştir ve yeniden düzenle.";
+            default -> "Sen deneyimli bir Java yazılım geliştiricisisin. Kullanıcının kodunu temiz kod ilkelerine göre iyileştir ve yeniden düzenle.";
+        };
+
+        String prompt = """
+        Problem Tanımı:
+        %s
+    
+        Kullanıcı Kodu:
+        %s
+    
+        Lütfen sadece düzeltilmiş ve iyileştirilmiş kodu döndür. Açıklama ekleme.
+        """.formatted(problemDescription, code);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(apiUrl)
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .bodyValue(Map.of(
+                        "model", "deepseek-coder",
+                        "max_tokens", 500,
+                        "temperature", 0.2,
+                        "messages", new Object[]{
+                                Map.of("role", "system", "content", systemMessage),
+                                Map.of("role", "user", "content", prompt)
+                        }
+                ))
+                .retrieve()
+                .bodyToMono(LLMResponse.class)
+                .map(response -> {
+                    String refactoredCode = response.getChoices().get(0).getMessage().getContent();
+                    feedbackWebSocketController.sendFeedback(userId, new WebSocketMessageDTO("CODE_REFACTOR", refactoredCode, null));
+                    return refactoredCode;
+                });
+    }
+
 
 }

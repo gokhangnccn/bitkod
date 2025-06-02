@@ -66,9 +66,21 @@ public class LLMFeedbackWorker {
                                 submission.getLanguage(),
                                 submission.getUserId()
                         ).subscribe(feedback -> {
-                            submission.setLlmFeedback(feedback);
+                            submission.setCodeQualityReason(feedback);
                             submissionRepository.save(submission);
                         }, error -> log.error("Kod kalitesi aciklamasi alinamadi: {}", error.getMessage()));
+                    }
+
+                    case CODE_REFACTOR -> {
+                        llmFeedbackService.refactorCode(
+                                task.problemDescription(),
+                                submission.getCode(),
+                                submission.getLanguage(),
+                                submission.getUserId()
+                        ).subscribe(refactoredCode -> {
+                            submission.setRefactoredCode(refactoredCode);
+                            submissionRepository.save(submission);
+                        }, error -> log.error("Refactor edilmiş kod alinamadi: {}", error.getMessage()));
                     }
 
                 }

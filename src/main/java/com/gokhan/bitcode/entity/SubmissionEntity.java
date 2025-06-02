@@ -26,6 +26,9 @@ public class SubmissionEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String code; // daha sonrasında nasıl saklayabiliriz? öğren
 
+    @Column(columnDefinition = "TEXT")
+    private String refactoredCode;
+
     @Column(nullable = false, length = 20)
     private String language; //daha sonra enum eklenebilir
 
@@ -40,6 +43,9 @@ public class SubmissionEntity {
 
     @Column(columnDefinition = "TEXT")
     private String llmFeedback;
+
+    @Column(columnDefinition = "TEXT")
+    private String codeQualityReason;
 
     @Column(nullable = false)
     private LocalDateTime submittedAt;

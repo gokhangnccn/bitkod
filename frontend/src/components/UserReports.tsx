@@ -47,9 +47,7 @@ export const UserReports: React.FC = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                console.log('Fetching reports...');
                 const response = await api.get('/problems/reports/user');
-                console.log('Reports Response:', response.data);
 
                 if (response.data.IsSucceeded) {
                     const reportsData = response.data.Data;

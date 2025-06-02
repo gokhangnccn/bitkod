@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import bitkodDark from '../assets/bitkod_dark.png';
+import bitkodLight from '../assets/bitkod_light.png';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -32,6 +34,9 @@ export function Layout({ children }: LayoutProps) {
         { to: '/problems', label: 'Sorular', icon: <Terminal className="h-5 w-5 mr-2" /> },
         { to: '/account', label: 'Profilim', icon: <User className="h-5 w-5 mr-2" /> },
         { to: '/leaderboard', label: 'Sıralama', icon: <User className="h-5 w-5 mr-2" /> },
+        ...(user?.role === 'ADMIN'
+            ? [{ to: '/admin', label: 'Admin', icon: <User className="h-5 w-5 mr-2" /> }]
+            : []),
     ];
 
     const handleLogout = () => {
@@ -42,14 +47,18 @@ export function Layout({ children }: LayoutProps) {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-zinc-900 dark:text-white transition-colors duration-300">
             {/* Navbar */}
-            <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-800/80 border-b border-gray-200 dark:border-zinc-700 shadow-sm">
+            <nav className="sticky top-0 z-50 backdrop-blur-md bg-blue-50/50 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-700 shadow-sm">
                 <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
                     {/* Sol: Logo ve Menü */}
                     <div className="flex items-center gap-6">
-                        <Link to="/" className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xl">
-                            <Code2 className="w-6 h-6" />
-                            BitCode
+                        <Link to="/" className="flex items-center gap-2">
+                            <img
+                                src={isDark ? bitkodDark : bitkodLight}
+                                alt="BitKod Logo"
+                                className="h-9 w-auto"
+                            />
                         </Link>
+
 
                         <div className="hidden sm:flex items-center gap-4">
                             {isAuthenticated &&
