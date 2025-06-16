@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/axios';
 import Loader from '../../components/Loader';
@@ -23,35 +23,34 @@ export default function ProblemsPage() {
   const pageSize = 20;
 
   const navigate = useNavigate();
-
   const prefix = window.location.hostname.startsWith('admin.') ? '' : '/admin';
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchProblems() {
-      try {
-        setError(null);
-        setLoading(true);
-        const res = await api.get('/admin/problems');
+  const fetchProblems = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const res = await api.get('/admin/problems');
 
-        if (!isMounted) return;
-
-        if (res.data.IsSucceeded) {
-          const data = res.data.Data;
-          setProblems(data?.content || data || []);
+      if (res.data.IsSucceeded) {
+        const data = res.data.Data;
+        if (Array.isArray(data)) {
+          setProblems(data);
+        } else if (data?.content && Array.isArray(data.content)) {
+          setProblems(data.content);
         } else {
-          setError(res.data.Message || 'Veriler alınamadı');
+          setProblems([]); // fallback
         }
-      } catch (e: any) {
-        if (isMounted) setError(e.response?.data?.Message || 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-      } finally {
-        if (isMounted) setLoading(false);
       }
+    } catch (e: any) {
+      setError(e.response?.data?.Message || 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+    } finally {
+      setLoading(false);
     }
-    fetchProblems();
-
-    return () => { isMounted = false; };
   }, []);
+
+  useEffect(() => {
+    fetchProblems();
+  }, [fetchProblems]);
 
   const filtered = problems.filter((p) => {
     const q = debouncedSearch.trim().toLowerCase();
@@ -79,7 +78,7 @@ export default function ProblemsPage() {
     try {
       const res = await api.delete(`/admin/problems/${id}`);
       if (res.status === 200) {
-        setProblems(prev => prev.filter(p => p.id !== id));
+        await fetchProblems();
       }
     } catch (err) {
       alert('Silme işlemi başarısız');

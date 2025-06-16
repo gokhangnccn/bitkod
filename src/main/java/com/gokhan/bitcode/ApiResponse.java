@@ -1,11 +1,13 @@
 package com.gokhan.bitcode;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
-public class ApiResponse<T> {
+public class ApiResponse<T> implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
 
     @JsonProperty("IsSucceeded")
     private final boolean isSucceeded;
@@ -22,13 +24,21 @@ public class ApiResponse<T> {
     @JsonProperty("Data")
     private final T data;
 
-    private ApiResponse(boolean isSucceeded, int resultCode, String label, String message, T data) {
+    @JsonCreator
+    public ApiResponse(
+            @JsonProperty("IsSucceeded") boolean isSucceeded,
+            @JsonProperty("ResultCode") int resultCode,
+            @JsonProperty("Label") String label,
+            @JsonProperty("Message") String message,
+            @JsonProperty("Data") T data
+    ) {
         this.isSucceeded = isSucceeded;
         this.resultCode = resultCode;
         this.label = label;
         this.message = message;
         this.data = data;
     }
+
 
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, 200, "BIT-0000", "Successful", data);

@@ -17,7 +17,6 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminRoutes from './admin/AdminRoutes';
 
 function App() {
-    // Check if we're on admin subdomain
     const isAdminSubdomain = window.location.hostname.startsWith('admin.');
 
     return (

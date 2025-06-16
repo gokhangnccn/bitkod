@@ -7,4 +7,6 @@ public record UserProfileDTO(
         String username,
         String email,
         LocalDateTime createdAt
-) {}
+) implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+}

@@ -5,6 +5,7 @@ import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import com.gokhan.bitcode.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -18,6 +19,7 @@ public class LeaderboardService {
     private final UserRepository userRepository;
     private final SubmissionRepository submissionRepository;
 
+    @Cacheable(value = "leaderboard", key = "'global'", unless = "#result == null || #result.isEmpty()")
     public List<LeaderboardEntryDTO> getLeaderboard() {
         List<UserEntity> users = userRepository.findAll();
 

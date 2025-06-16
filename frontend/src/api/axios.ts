@@ -8,7 +8,7 @@ class ApiClient {
         this.api = axios.create({
             baseURL:
              //'http://localhost:8040/api',
-              'https://api.bitkod.org/api',
+            'https://api.bitkod.org/api',
             withCredentials: true,
         });
 

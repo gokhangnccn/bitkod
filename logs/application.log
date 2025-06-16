@@ -1,0 +1,588 @@
+2025-06-15T10:14:47.006+03:00  INFO 28028 --- [BitCode] [main] com.gokhan.bitcode.BitCodeApplication    : Starting BitCodeApplication using Java 21.0.3 with PID 28028 (C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main started by ROG-GOKHAN in C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode)
+2025-06-15T10:14:47.008+03:00 DEBUG 28028 --- [BitCode] [main] com.gokhan.bitcode.BitCodeApplication    : Running with Spring Boot v3.4.4, Spring v6.2.5
+2025-06-15T10:14:47.010+03:00  INFO 28028 --- [BitCode] [main] com.gokhan.bitcode.BitCodeApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-15T10:14:48.839+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-15T10:14:48.842+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-06-15T10:14:48.859+03:00 DEBUG 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Scanning for JPA repositories in packages com.gokhan.bitcode.
+2025-06-15T10:14:48.875+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\PasswordResetTokenRepository.class]
+2025-06-15T10:14:48.875+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\ProblemReportRepository.class]
+2025-06-15T10:14:48.875+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\ProblemRepository.class]
+2025-06-15T10:14:48.875+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\SubmissionRepository.class]
+2025-06-15T10:14:48.875+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\TestCaseRepository.class]
+2025-06-15T10:14:48.876+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\UserRepository.class]
+2025-06-15T10:14:48.876+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\VerificationTokenRepository.class]
+2025-06-15T10:14:49.092+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 231 ms. Found 7 JPA repository interfaces.
+2025-06-15T10:14:49.120+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-15T10:14:49.122+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-06-15T10:14:49.144+03:00 DEBUG 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Scanning for Redis repositories in packages com.gokhan.bitcode.
+2025-06-15T10:14:49.150+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\PasswordResetTokenRepository.class]
+2025-06-15T10:14:49.150+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\ProblemReportRepository.class]
+2025-06-15T10:14:49.151+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\ProblemRepository.class]
+2025-06-15T10:14:49.151+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\SubmissionRepository.class]
+2025-06-15T10:14:49.151+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\TestCaseRepository.class]
+2025-06-15T10:14:49.151+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\UserRepository.class]
+2025-06-15T10:14:49.151+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.c.RepositoryComponentProvider    : Identified candidate component class: file [C:\Users\ROG-GOKHAN.gokhan\IdeaProjects\bitcode\build\classes\java\main\com\gokhan\bitcode\repository\VerificationTokenRepository.class]
+2025-06-15T10:14:49.154+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.PasswordResetTokenRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.154+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.ProblemReportRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.155+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.ProblemRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.155+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.SubmissionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.155+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.TestCaseRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.156+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.156+03:00  INFO 28028 --- [BitCode] [main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.gokhan.bitcode.repository.VerificationTokenRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-06-15T10:14:49.156+03:00  INFO 28028 --- [BitCode] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+2025-06-15T10:14:50.364+03:00  INFO 28028 --- [BitCode] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8040 (http)
+2025-06-15T10:14:50.383+03:00  INFO 28028 --- [BitCode] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-15T10:14:50.383+03:00  INFO 28028 --- [BitCode] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-06-15T10:14:50.478+03:00  INFO 28028 --- [BitCode] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-15T10:14:50.479+03:00  INFO 28028 --- [BitCode] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3405 ms
+2025-06-15T10:14:50.805+03:00 DEBUG 28028 --- [BitCode] [main] com.gokhan.bitcode.utils.JwtFilter       : Filter 'jwtFilter' configured for use
+2025-06-15T10:14:50.998+03:00  INFO 28028 --- [BitCode] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-15T10:14:51.107+03:00  INFO 28028 --- [BitCode] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-06-15T10:14:51.165+03:00  INFO 28028 --- [BitCode] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-15T10:14:51.598+03:00  INFO 28028 --- [BitCode] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-06-15T10:14:51.643+03:00  INFO 28028 --- [BitCode] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-15T10:14:52.941+03:00  INFO 28028 --- [BitCode] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@412440c1
+2025-06-15T10:14:52.942+03:00  INFO 28028 --- [BitCode] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-15T10:14:53.125+03:00  WARN 28028 --- [BitCode] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-15T10:14:53.457+03:00  INFO 28028 --- [BitCode] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-15T10:14:54.705+03:00  INFO 28028 --- [BitCode] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-15T10:14:59.016+03:00  INFO 28028 --- [BitCode] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-06-15T10:14:59.483+03:00  INFO 28028 --- [BitCode] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-06-15T10:15:03.205+03:00  WARN 28028 --- [BitCode] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-15T10:15:03.990+03:00  INFO 28028 --- [BitCode] [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-06-15T10:15:05.216+03:00  INFO 28028 --- [BitCode] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-06-15T10:15:05.216+03:00  INFO 28028 --- [BitCode] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6af12899]]
+2025-06-15T10:15:05.217+03:00  INFO 28028 --- [BitCode] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-06-15T10:15:05.392+03:00  INFO 28028 --- [BitCode] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8040 (http) with context path '/'
+2025-06-15T10:15:05.393+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.l.RedisMessageListenerContainer  : Starting RedisMessageListenerContainer...
+2025-06-15T10:15:05.394+03:00 DEBUG 28028 --- [BitCode] [main] o.s.d.r.l.RedisMessageListenerContainer  : Postpone listening for Redis messages until actual listeners are added
+2025-06-15T10:15:05.408+03:00  INFO 28028 --- [BitCode] [main] com.gokhan.bitcode.BitCodeApplication    : Started BitCodeApplication in 19.023 seconds (process running for 19.941)
+2025-06-15T10:15:05.418+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:05.893+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:05.894+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:05.894+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:05.899+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:06.043+03:00  INFO 28028 --- [BitCode] [RMI TCP Connection(2)-10.52.176.42] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-15T10:15:06.044+03:00  INFO 28028 --- [BitCode] [RMI TCP Connection(2)-10.52.176.42] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-06-15T10:15:06.047+03:00  INFO 28028 --- [BitCode] [RMI TCP Connection(2)-10.52.176.42] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2025-06-15T10:15:08.903+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:08.907+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:08.908+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:08.908+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:08.911+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:11.923+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:11.927+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:11.927+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:11.927+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:11.929+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:14.935+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:14.938+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:14.938+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:14.938+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:14.940+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:17.949+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:17.952+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:17.953+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:17.953+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:17.954+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:20.959+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:20.963+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:20.963+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:20.963+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:20.966+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:22.693+03:00 DEBUG 28028 --- [BitCode] [http-nio-8040-exec-7] c.gokhan.bitcode.service.ProblemService  : >> [Cache] getAllProblems çağrıldı
+2025-06-15T10:15:23.096+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-7] c.gokhan.bitcode.service.ProblemService  : >> [Cache] getAllProblems tamamlandı - 17 problem bulundu
+2025-06-15T10:15:23.115+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-7] c.g.b.controller.ProblemController       : [GET /api/problems] 17 problem başarıyla alındı - userId: 16, duration: 431 ms
+2025-06-15T10:15:23.977+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:23.981+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:23.981+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:23.981+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:23.984+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:26.992+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:26.995+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:26.995+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:26.995+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:26.997+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:30.007+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:30.009+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:30.010+03:00  INFO 28028 --- [BitCode] [MessageBroker-7] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:30.010+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:30.011+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:32.071+03:00 DEBUG 28028 --- [BitCode] [http-nio-8040-exec-6] c.gokhan.bitcode.service.ProblemService  : >> [Cache] getProblemByUid çağrıldı - uid: 5a241173-7907-4ced-817b-98c8521dacb9
+2025-06-15T10:15:32.266+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-6] c.gokhan.bitcode.service.ProblemService  : >> [Cache] getProblemByUid tamamlandı - uid: 5a241173-7907-4ced-817b-98c8521dacb9, bulundu: true
+2025-06-15T10:15:32.269+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-6] c.g.b.controller.ProblemController       : [GET /api/problems/5a241173-7907-4ced-817b-98c8521dacb9] Başarıyla alındı - userId: 16, duration: 203 ms
+2025-06-15T10:15:33.024+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:33.027+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:33.027+03:00  INFO 28028 --- [BitCode] [MessageBroker-6] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:33.027+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:33.029+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:36.036+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:36.039+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:36.039+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:36.040+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:36.043+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:39.048+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:39.052+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:39.053+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:39.053+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:39.055+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:42.065+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:42.069+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:42.069+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:42.069+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:42.071+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:42.321+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-4] c.g.b.controller.ProblemController       : [GET /api/problems] 17 problem başarıyla alındı - userId: 16, duration: 8 ms
+2025-06-15T10:15:45.074+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:45.077+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:45.077+03:00  INFO 28028 --- [BitCode] [MessageBroker-7] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:45.077+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:45.080+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:48.092+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:48.094+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:48.094+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:48.094+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:48.097+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:51.109+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:51.112+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:51.112+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:51.112+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:51.114+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:53.094+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-5] c.g.b.controller.ProblemController       : [GET /api/problems/5a241173-7907-4ced-817b-98c8521dacb9] Başarıyla alındı - userId: 16, duration: 4 ms
+2025-06-15T10:15:54.124+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:54.127+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:54.127+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:54.127+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:54.130+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:57.139+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:57.141+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:57.142+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:15:57.142+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:15:57.143+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:15:58.591+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-2] c.g.b.controller.ProblemController       : [GET /api/problems] 17 problem başarıyla alındı - userId: 16, duration: 3 ms
+2025-06-15T10:16:00.156+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:00.159+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:00.159+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:00.159+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:00.161+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:03.166+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:03.169+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:03.169+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:03.169+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:03.171+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:05.186+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(2)], stompBrokerRelay[null], inboundChannel[pool size = 30, active threads = 0, queued tasks = 0, completed tasks = 30], outboundChannel[pool size = 6, active threads = 0, queued tasks = 0, completed tasks = 6], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 2, completed tasks = 27]
+2025-06-15T10:16:06.178+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:06.182+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:06.182+03:00  INFO 28028 --- [BitCode] [MessageBroker-4] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:06.182+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:06.183+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:09.199+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:09.202+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:09.202+03:00  INFO 28028 --- [BitCode] [MessageBroker-10] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:09.202+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:09.204+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:12.212+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:12.214+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:12.214+03:00  INFO 28028 --- [BitCode] [MessageBroker-11] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:12.214+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:12.217+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:15.222+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:15.224+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:15.225+03:00  INFO 28028 --- [BitCode] [MessageBroker-11] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:15.225+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:15.226+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:18.231+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:18.233+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:18.233+03:00  INFO 28028 --- [BitCode] [MessageBroker-12] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:18.233+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:18.235+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:21.243+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:21.245+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:21.245+03:00  INFO 28028 --- [BitCode] [MessageBroker-12] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:21.245+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:21.247+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:24.251+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:24.253+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:24.253+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:24.253+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:24.255+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:25.671+03:00  WARN 28028 --- [BitCode] [http-nio-8040-exec-10] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2025-06-15T10:16:27.257+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:27.259+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:27.259+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:27.259+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:27.261+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:30.273+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:30.276+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:30.276+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:30.276+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:30.278+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:33.291+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:33.294+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:33.294+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:33.294+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:33.295+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:36.303+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:36.305+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:36.305+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:36.305+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:36.307+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:39.322+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:39.324+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:39.324+03:00  INFO 28028 --- [BitCode] [MessageBroker-10] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:39.324+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:39.326+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:42.337+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:42.339+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:42.339+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:42.339+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:42.341+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:45.350+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:45.353+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:45.353+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:45.353+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:45.355+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:48.357+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:48.359+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:48.359+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:48.359+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:48.361+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:51.372+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:51.374+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:51.374+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:51.374+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:51.377+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:54.382+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:54.384+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:54.385+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:54.385+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:54.386+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:55.838+03:00  INFO 28028 --- [BitCode] [http-nio-8040-exec-4] c.g.b.controller.ProblemController       : [GET /api/problems] 17 problem başarıyla alındı - userId: 16, duration: 4 ms
+2025-06-15T10:16:57.402+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:57.404+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:16:57.404+03:00  INFO 28028 --- [BitCode] [MessageBroker-4] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:16:57.404+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:16:57.406+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:00.408+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:00.410+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:00.410+03:00  INFO 28028 --- [BitCode] [MessageBroker-4] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:00.410+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:00.412+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:03.426+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:03.429+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:03.429+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:03.429+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:03.431+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:06.445+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:06.447+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:06.448+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:06.448+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:06.449+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:09.460+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:09.463+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:09.463+03:00  INFO 28028 --- [BitCode] [MessageBroker-13] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:09.463+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:09.464+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:12.471+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:12.474+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:12.474+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:12.474+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:12.477+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:15.486+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:15.488+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:15.489+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:15.489+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:15.490+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:18.503+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:18.505+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:18.505+03:00  INFO 28028 --- [BitCode] [MessageBroker-12] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:18.505+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:18.507+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:21.514+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:21.516+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:21.516+03:00  INFO 28028 --- [BitCode] [MessageBroker-12] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:21.516+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:21.519+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:24.531+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:24.535+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:24.535+03:00  INFO 28028 --- [BitCode] [MessageBroker-7] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:24.535+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:24.538+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:27.547+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:27.551+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:27.551+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:27.552+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:27.555+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:30.564+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:30.566+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:30.566+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:30.566+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:30.570+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:33.574+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:33.578+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:33.578+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:33.578+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:33.581+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:36.594+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:36.598+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:36.598+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:36.598+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:36.601+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:39.609+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:39.612+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:39.612+03:00  INFO 28028 --- [BitCode] [MessageBroker-13] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:39.612+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:39.615+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:42.630+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:42.634+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:42.634+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:42.634+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:42.638+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:45.653+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:45.657+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:45.657+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:45.657+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:45.661+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:48.666+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:48.671+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:48.671+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:48.671+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:48.675+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:51.678+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:51.684+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:51.684+03:00  INFO 28028 --- [BitCode] [MessageBroker-4] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:51.684+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:51.689+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-4] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:54.696+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:54.700+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:54.701+03:00  INFO 28028 --- [BitCode] [MessageBroker-7] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:54.701+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:54.704+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-7] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:57.715+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:57.719+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:17:57.720+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:17:57.720+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:17:57.724+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:00.730+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:00.734+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:00.734+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:00.734+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:00.739+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:03.750+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:03.756+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:03.756+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:03.756+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:03.759+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:06.772+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:06.776+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:06.776+03:00  INFO 28028 --- [BitCode] [MessageBroker-14] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:06.776+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:06.780+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-14] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:09.788+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:09.792+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:09.792+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:09.792+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:09.794+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:12.807+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:12.812+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:12.812+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:12.812+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:12.815+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:15.821+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:15.824+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:15.824+03:00  INFO 28028 --- [BitCode] [MessageBroker-16] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:15.824+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:15.826+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-16] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:18.829+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:18.833+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:18.833+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:18.833+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:18.835+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:21.838+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:21.841+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:21.841+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:21.841+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:21.844+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:24.849+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:24.852+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:24.852+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:24.852+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:24.854+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:27.864+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:27.866+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:27.866+03:00  INFO 28028 --- [BitCode] [MessageBroker-6] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:27.866+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:27.868+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:30.881+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:30.883+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:30.883+03:00  INFO 28028 --- [BitCode] [MessageBroker-6] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:30.883+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:30.885+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:33.896+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:33.899+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:33.899+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:33.899+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:33.901+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:36.915+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:36.917+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:36.917+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:36.918+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:36.919+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:39.932+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:39.934+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:39.934+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:39.934+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:39.936+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:42.940+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:42.942+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:42.943+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:42.943+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:42.945+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:45.946+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:45.949+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:45.949+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:45.949+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:45.951+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:48.965+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:48.967+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:48.967+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:48.967+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:48.969+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:51.981+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:51.984+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:51.984+03:00  INFO 28028 --- [BitCode] [MessageBroker-9] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:51.984+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:51.986+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-9] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:54.996+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:54.998+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:54.998+03:00  INFO 28028 --- [BitCode] [MessageBroker-11] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:54.999+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:55.000+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-11] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:58.005+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:58.009+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:18:58.009+03:00  INFO 28028 --- [BitCode] [MessageBroker-6] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:18:58.009+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:18:58.013+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:01.024+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:01.027+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:01.027+03:00  INFO 28028 --- [BitCode] [MessageBroker-6] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:01.027+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:01.029+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-6] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:04.035+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:04.039+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:04.039+03:00  INFO 28028 --- [BitCode] [MessageBroker-13] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:04.039+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:04.041+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:07.047+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:07.049+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:07.049+03:00  INFO 28028 --- [BitCode] [MessageBroker-13] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:07.049+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:07.051+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-13] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:10.059+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:10.062+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:10.062+03:00  INFO 28028 --- [BitCode] [MessageBroker-1] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:10.062+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:10.065+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-1] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:13.072+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:13.075+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:13.075+03:00  INFO 28028 --- [BitCode] [MessageBroker-10] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:13.075+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:13.077+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:16.078+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:16.081+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:16.081+03:00  INFO 28028 --- [BitCode] [MessageBroker-10] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:16.081+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:16.084+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-10] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:19.092+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:19.095+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:19.095+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:19.095+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:19.096+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:22.109+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:22.112+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:22.112+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:22.112+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:22.114+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:25.125+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:25.127+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:25.128+03:00  INFO 28028 --- [BitCode] [MessageBroker-12] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:25.128+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:25.129+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-12] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:28.138+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:28.139+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:28.139+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:28.140+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:28.141+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:31.142+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:31.144+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:31.145+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:31.145+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:31.147+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:34.154+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:34.157+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:34.158+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:34.158+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:34.160+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:37.172+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:37.187+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:37.187+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:37.187+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:37.191+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:40.206+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:40.208+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:40.208+03:00  INFO 28028 --- [BitCode] [MessageBroker-15] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:40.208+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:40.210+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-15] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:43.219+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:43.222+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:43.222+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:43.223+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:43.225+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:46.233+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:46.235+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:46.235+03:00  INFO 28028 --- [BitCode] [MessageBroker-5] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:46.235+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:46.236+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-5] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:49.247+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:49.249+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:49.250+03:00  INFO 28028 --- [BitCode] [MessageBroker-3] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:49.250+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:49.251+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-3] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:52.253+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:52.255+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:52.255+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:52.256+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:52.257+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:55.272+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:55.274+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:55.274+03:00  INFO 28028 --- [BitCode] [MessageBroker-2] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:55.274+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:55.275+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-2] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:58.277+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:58.280+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:19:58.280+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:19:58.280+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:19:58.282+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:20:01.293+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:20:01.295+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:20:01.296+03:00  INFO 28028 --- [BitCode] [MessageBroker-8] c.gokhan.bitcode.llm.LLMFeedbackWorker   : Kuyruktaki Gorevler: 0
+2025-06-15T10:20:01.296+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Fetching Redis Connection from RedisConnectionFactory
+2025-06-15T10:20:01.298+03:00 DEBUG 28028 --- [BitCode] [MessageBroker-8] o.s.d.redis.core.RedisConnectionUtils    : Closing Redis Connection
+2025-06-15T10:20:03.567+03:00 DEBUG 28028 --- [BitCode] [SpringApplicationShutdownHook] o.s.d.r.l.RedisMessageListenerContainer  : Stopped RedisMessageListenerContainer
+2025-06-15T10:20:03.568+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-15T10:20:03.588+03:00  INFO 28028 --- [BitCode] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-06-15T10:20:03.591+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2025-06-15T10:20:03.591+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6af12899]]
+2025-06-15T10:20:03.591+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2025-06-15T10:20:05.665+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-06-15T10:20:05.668+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-15T10:20:05.672+03:00  INFO 28028 --- [BitCode] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

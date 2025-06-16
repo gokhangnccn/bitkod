@@ -8,6 +8,9 @@ import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.TestCaseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,10 @@ public class AdminProblemService {
     private final TestCaseRepository testCaseRepository;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "problems", allEntries = true),
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public ProblemResponseDTO create(ProblemRequestDTO dto, String adminId) {
         ProblemEntity entity = ProblemEntity.builder()
                 .title(dto.getTitle())
@@ -39,6 +46,10 @@ public class AdminProblemService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "problems", allEntries = true),
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public ProblemResponseDTO update(Long id, ProblemRequestDTO dto) {
         ProblemEntity entity = problemRepository.findById(id).orElseThrow(() -> new RuntimeException("Problem not found"));
         entity.setTitle(dto.getTitle());
@@ -55,12 +66,20 @@ public class AdminProblemService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "problems", allEntries = true),
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public void delete(Long id) {
         testCaseRepository.deleteByProblemId(id);
         problemRepository.deleteById(id);
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "problems", allEntries = true),
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public void bulkDelete(List<Long> ids) {
         ids.forEach(this::delete);
     }

@@ -11,17 +11,21 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
-    ResponsiveContainer
+    ResponsiveContainer,
+    AreaChart,
+    Area
 } from 'recharts';
 
 interface UserChartsProps {
     submissionsByDay: { date: string; count: number }[];
     submissionsByLanguage: { language: string; count: number }[];
     submissionsByDifficulty: { difficulty: string; count: number }[];
+    hourlyActivity?: { hour: number; count: number }[];
+    weeklyTrend?: { week: string; count: number }[];
+    successRateOverTime?: { date: string; successRate: number }[];
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -45,12 +49,42 @@ const formatDate = (dateStr: string) => {
 export const UserCharts: React.FC<UserChartsProps> = ({
     submissionsByDay,
     submissionsByLanguage,
-    submissionsByDifficulty
+    submissionsByDifficulty,
+    hourlyActivity = [],
+    weeklyTrend = [],
+    successRateOverTime = []
 }) => {
     // Veri kontrolü
     const hasData = submissionsByDay?.length > 0 || 
                    submissionsByLanguage?.length > 0 || 
                    submissionsByDifficulty?.length > 0;
+
+    // Günlük gönderim verilerini formatla
+    const dailyData = submissionsByDay?.map(item => ({
+        date: new Date(item.date).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }),
+        count: item.count
+    })) || [];
+
+    // Saatlik aktivite verilerini formatla
+    const hourlyData = Array.from({ length: 24 }, (_, i) => {
+        const found = hourlyActivity.find(h => h.hour === i);
+        return {
+            hour: `${i.toString().padStart(2, '0')}:00`,
+            count: found ? found.count : 0
+        };
+    });
+
+    // Haftalık trend verilerini formatla
+    const weeklyData = weeklyTrend.map(item => ({
+        week: new Date(item.week).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }),
+        count: item.count
+    }));
+
+    // Başarı oranı trendi verilerini formatla
+    const successData = successRateOverTime.map(item => ({
+        date: new Date(item.date).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }),
+        successRate: Number(item.successRate.toFixed(2))
+    }));
 
     if (!hasData) {
         return (
@@ -61,139 +95,219 @@ export const UserCharts: React.FC<UserChartsProps> = ({
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Günlük Gönderimler */}
-            {submissionsByDay?.length > 0 && (
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Günlük Gönderimler</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={submissionsByDay}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
+        <div className="space-y-8">
+            {/* Mevcut grafikler */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Son 7 Gün Grafiği */}
+                {dailyData && dailyData.length > 0 && (
+                    <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                            Son 7 Gün Gönderim Sayısı
+                        </h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={dailyData}>
+                                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                                 <XAxis 
                                     dataKey="date" 
-                                    tickFormatter={formatDate}
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
+                                    className="text-xs"
+                                    tick={{ fill: 'currentColor', fontSize: 12 }}
                                 />
-                                <YAxis 
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend />
-                                <Bar 
-                                    dataKey="count" 
-                                    fill="#8884d8" 
-                                    name="Gönderim Sayısı"
-                                    radius={[4, 4, 0, 0]}
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            )}
-
-            {/* Programlama Dilleri */}
-            {submissionsByLanguage?.length > 0 && (
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Programlama Dilleri</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={submissionsByLanguage}
-                                    dataKey="count"
-                                    nameKey="language"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={80}
-                                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                    labelLine={false}
-                                >
-                                    {submissionsByLanguage.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            )}
-
-            {/* Zorluk Seviyeleri */}
-            {submissionsByDifficulty?.length > 0 && (
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Zorluk Seviyelerine Göre Başarılı Çözümler</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={submissionsByDifficulty}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                                <XAxis 
-                                    dataKey="difficulty" 
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
-                                    tickFormatter={(value) => {
-                                        switch (value) {
-                                            case 'EASY': return 'Kolay';
-                                            case 'MEDIUM': return 'Orta';
-                                            case 'HARD': return 'Zor';
-                                            default: return value;
-                                        }
+                                <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        backgroundColor: '#fff', 
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        color: '#1f2937'
                                     }}
                                 />
-                                <YAxis 
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend />
-                                <Bar 
-                                    dataKey="count" 
-                                    fill="#82ca9d" 
-                                    name="Başarılı Çözüm Sayısı"
-                                    radius={[4, 4, 0, 0]}
-                                />
+                                <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
+                )}
+
+                {/* Programlama Dilleri */}
+                {submissionsByLanguage && submissionsByLanguage.length > 0 && (
+                    <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                            Programlama Dilleri
+                        </h3>
+                        <div className="flex flex-col lg:flex-row items-center">
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={submissionsByLanguage}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ language, percent }) => `${language} (${(percent * 100).toFixed(0)}%)`}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="count"
+                                    >
+                                        {submissionsByLanguage.map((_, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Zorluk Seviyesi Grafiği */}
+            {submissionsByDifficulty && submissionsByDifficulty.length > 0 && (
+                <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                        Zorluk Seviyelerine Göre Çözülen Problemler
+                    </h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={submissionsByDifficulty}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis 
+                                dataKey="difficulty" 
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                                tickFormatter={(value) => {
+                                    switch (value) {
+                                        case 'EASY': return 'Kolay';
+                                        case 'MEDIUM': return 'Orta';
+                                        case 'HARD': return 'Zor';
+                                        default: return value;
+                                    }
+                                }}
+                            />
+                            <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    color: '#1f2937'
+                                }}
+                                formatter={(value, name) => [value, 'Problem Sayısı']}
+                                labelFormatter={(label) => {
+                                    switch (label) {
+                                        case 'EASY': return 'Kolay';
+                                        case 'MEDIUM': return 'Orta';
+                                        case 'HARD': return 'Zor';
+                                        default: return label;
+                                    }
+                                }}
+                            />
+                            <Bar dataKey="count" fill="#10B981" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
                 </div>
             )}
 
-            {/* Başarı Oranı Trendi */}
-            {submissionsByDay?.length > 0 && (
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Başarı Oranı Trendi</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={submissionsByDay}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                                <XAxis 
-                                    dataKey="date" 
-                                    tickFormatter={formatDate}
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
-                                />
-                                <YAxis 
-                                    stroke="#6B7280"
-                                    tick={{ fill: '#6B7280' }}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend />
-                                <Line
-                                    type="monotone"
-                                    dataKey="count"
-                                    stroke="#8884d8"
-                                    name="Başarı Oranı"
-                                    strokeWidth={2}
-                                    dot={{ fill: '#8884d8', strokeWidth: 2 }}
-                                    activeDot={{ r: 6, fill: '#8884d8' }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
+            {/* Yeni grafikler */}
+            {hourlyActivity.length > 0 && (
+                <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                        Saatlik Aktivite Dağılımı
+                    </h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={hourlyData}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis 
+                                dataKey="hour" 
+                                className="text-xs"
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                            />
+                            <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    color: '#1f2937'
+                                }}
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="count" 
+                                stroke="#8B5CF6" 
+                                fill="#8B5CF6" 
+                                fillOpacity={0.3}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
+
+            {weeklyTrend.length > 0 && (
+                <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                        Haftalık Aktivite Trendi
+                    </h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={weeklyData}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis 
+                                dataKey="week" 
+                                className="text-xs"
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                            />
+                            <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    color: '#1f2937'
+                                }}
+                            />
+                            <Line 
+                                type="monotone" 
+                                dataKey="count" 
+                                stroke="#F59E0B" 
+                                strokeWidth={3}
+                                dot={{ fill: '#F59E0B', strokeWidth: 2, r: 6 }}
+                                activeDot={{ r: 8 }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
+
+            {successRateOverTime.length > 0 && (
+                <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                        Başarı Oranı Gelişimi (Son 30 Gün)
+                    </h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={successData}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis 
+                                dataKey="date" 
+                                className="text-xs"
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                            />
+                            <YAxis 
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                                domain={[0, 100]}
+                            />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    color: '#1f2937'
+                                }}
+                                formatter={(value) => [`%${Number(value).toFixed(2)}`, 'Başarı Oranı']}
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="successRate" 
+                                stroke="#EF4444" 
+                                fill="#EF4444" 
+                                fillOpacity={0.3}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
                 </div>
             )}
         </div>

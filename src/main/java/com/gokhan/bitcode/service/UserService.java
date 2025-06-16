@@ -6,6 +6,9 @@ import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.repository.UserRepository;
 import com.gokhan.bitcode.utils.UserClaims;
 import com.gokhan.bitcode.utils.UsernameValidator;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +22,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Cacheable(value = "users", key = "'all'", unless = "#result == null || !#result.succeeded")
     public ApiResponse<List<UserEntity>> getAllUsers(UserClaims userClaims) {
         if (!userClaims.getRole().equalsIgnoreCase("ADMIN")) {
             return ApiResponse.forbidden("Tüm kullanıcıları listelemek için admin yetkisi gereklidir.");
@@ -26,6 +30,7 @@ public class UserService {
         return ApiResponse.success(userRepository.findAll());
     }
 
+    @Cacheable(value = "users", key = "#id", unless = "#result == null || !#result.succeeded")
     public ApiResponse<UserProfileDTO> getUserById(Long id, UserClaims userClaims) {
         boolean isAdmin = "ADMIN".equalsIgnoreCase(userClaims.getRole());
         boolean isOwner = userClaims.getUserId().equals(String.valueOf(id));
@@ -46,6 +51,10 @@ public class UserService {
                 .orElse(ApiResponse.userNotFound());
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "'all'"),
+            @CacheEvict(value = "users", key = "#id")
+    })
     public ApiResponse<UserProfileDTO> updateUsername(Long id, String newUsername, UserClaims userClaims) {
         boolean isAdmin = "ADMIN".equalsIgnoreCase(userClaims.getRole());
         boolean isOwner = userClaims.getUserId().equals(String.valueOf(id));
@@ -90,6 +99,10 @@ public class UserService {
                 .orElse(ApiResponse.<UserProfileDTO>userNotFound());
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "'all'"),
+            @CacheEvict(value = "users", key = "#id")
+    })
     public ApiResponse<Void> deleteUserById(Long id, UserClaims userClaims) {
         if (!userClaims.getRole().equalsIgnoreCase("ADMIN")) {
             return ApiResponse.forbidden("Kullanıcı silme işlemi sadece admin yetkisiyle yapılabilir.");

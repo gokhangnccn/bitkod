@@ -19,9 +19,6 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     // Belirli bir kullanıcı ve probleme ait gönderimler
     List<SubmissionEntity> findByUserIdAndProblemId(Long userId, Long problemId);
 
-    // Başarılı çözümleri getir
-    List<SubmissionEntity> findByUserIdAndPassedTrue(Long userId);
-
     // Belirli bir problemi başarıyla çözen kullanıcıların listesi
     List<SubmissionEntity> findByProblemIdAndPassedTrue(Long problemId);
 
@@ -38,9 +35,6 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     List<Long> findSolvedProblemIdsByUserId(@Param("userId") Long userId);
 
     boolean existsByUserIdAndProblemIdAndPassedTrue(Long userId, Long problemId);
-
-    @Query("SELECT AVG(s.codeQualityScore) FROM SubmissionEntity s WHERE s.userId = :userId AND s.passed = true")
-    Double findAverageCodeQualityScoreByUserId(@Param("userId") Long userId);
 
     long countBySubmittedAtBetween(LocalDateTime start, LocalDateTime end);
 
@@ -80,11 +74,61 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     @Query(value = "SELECT p.difficulty as difficulty, COUNT(*) as count FROM submission s JOIN problems p ON s.problem_id = p.id GROUP BY p.difficulty", nativeQuery = true)
     List<Object[]> countByProblemDifficulty();
 
-    // Ortalama çözüm süresi (saat cinsinden) : problem oluşturulma tarihi ile ilk başarılı gönderim arasındaki süreyi baz alır
-    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM (s.submitted_at - p.created_at)))/3600 FROM submission s JOIN problems p ON s.problem_id = p.id WHERE s.passed = true", nativeQuery = true)
-    Double calculateAverageSolutionTime();
-
     // Başarı oranı trendi (günlük). Başarı oranı = başarılı / toplam.
     @Query(value = "SELECT DATE(submitted_at) as date, (SUM(CASE WHEN passed = true THEN 1 ELSE 0 END)::float / COUNT(*)) * 100 as success_rate FROM submission GROUP BY DATE(submitted_at) ORDER BY date", nativeQuery = true)
     List<Object[]> getDailySuccessRateTrend();
+
+    @Query(value = "SELECT CASE WHEN passed = true THEN 'BAŞARILI' ELSE 'BAŞARISIZ' END as status, COUNT(*) as cnt FROM submission GROUP BY status", nativeQuery = true)
+    List<Object[]> countBySubmissionStatus();
+
+    // Kullanıcının saatlik aktivite dağılımı
+    @Query(value = "SELECT EXTRACT(HOUR FROM submitted_at) as hour, COUNT(*) as count FROM submission WHERE user_id = :userId GROUP BY EXTRACT(HOUR FROM submitted_at) ORDER BY hour", nativeQuery = true)
+    List<Object[]> getHourlyActivityByUserId(@Param("userId") Long userId);
+
+    // Kullanıcının haftalık aktivite trendi
+    @Query(value = "SELECT DATE_TRUNC('week', submitted_at) as week, COUNT(*) as count FROM submission WHERE user_id = :userId GROUP BY DATE_TRUNC('week', submitted_at) ORDER BY week DESC LIMIT 12", nativeQuery = true)
+    List<Object[]> getWeeklyTrendByUserId(@Param("userId") Long userId);
+
+    // Kullanıcının başarı oranı trendi (son 30 gün)
+    @Query(value = "SELECT DATE(submitted_at) as date, " +
+            "(SUM(CASE WHEN passed = true THEN 1 ELSE 0 END)::float / COUNT(*)) * 100 as success_rate " +
+            "FROM submission WHERE user_id = :userId AND submitted_at >= CURRENT_DATE - INTERVAL '30 days' " +
+            "GROUP BY DATE(submitted_at) ORDER BY date", nativeQuery = true)
+    List<Object[]> getSuccessRateTrendByUserId(@Param("userId") Long userId);
+
+    // İlk denemede başarılı olan problemleri say
+    @Query(value = "SELECT COUNT(DISTINCT problem_id) FROM submission s1 WHERE s1.user_id = :userId AND s1.passed = true " +
+            "AND NOT EXISTS (SELECT 1 FROM submission s2 WHERE s2.user_id = :userId AND s2.problem_id = s1.problem_id " +
+            "AND s2.submitted_at < s1.submitted_at)", nativeQuery = true)
+    long countFirstTrySuccessByUserId(@Param("userId") Long userId);
+
+    // Kullanıcının her probleme ortalama kaç deneme yaptığı
+    @Query(value = "SELECT AVG(attempt_count) FROM (" +
+            "SELECT problem_id, COUNT(*) as attempt_count FROM submission WHERE user_id = :userId " +
+            "GROUP BY problem_id) sub", nativeQuery = true)
+    Double getAverageAttemptsPerProblemByUserId(@Param("userId") Long userId);
+
+    // Bu ay çözülen problem sayısı
+    @Query(value = "SELECT COUNT(DISTINCT problem_id) FROM submission WHERE user_id = :userId AND passed = true " +
+            "AND EXTRACT(YEAR FROM submitted_at) = EXTRACT(YEAR FROM CURRENT_DATE) " +
+            "AND EXTRACT(MONTH FROM submitted_at) = EXTRACT(MONTH FROM CURRENT_DATE)", nativeQuery = true)
+    long countThisMonthSolvedByUserId(@Param("userId") Long userId);
+
+    // Bu hafta çözülen problem sayısı
+    @Query(value = "SELECT COUNT(DISTINCT problem_id) FROM submission WHERE user_id = :userId AND passed = true " +
+            "AND submitted_at >= DATE_TRUNC('week', CURRENT_DATE)", nativeQuery = true)
+    long countThisWeekSolvedByUserId(@Param("userId") Long userId);
+
+    // Dil bazlı performans istatistikleri
+    @Query(value = "SELECT s.language, " +
+            "COUNT(DISTINCT CASE WHEN s.passed = true THEN s.problem_id END) as solved, " +
+            "(SUM(CASE WHEN s.passed = true THEN 1 ELSE 0 END)::float / COUNT(*)) * 100 as success_rate " +
+            "FROM submission s WHERE s.user_id = :userId GROUP BY s.language HAVING COUNT(*) >= 3", nativeQuery = true)
+    List<Object[]> getLanguagePerformanceByUserId(@Param("userId") Long userId);
+
+    // Kullanıcının günlük aktivitesini son 60 gün için al (streak hesaplama için)
+    @Query(value = "SELECT DATE(submitted_at) as date FROM submission WHERE user_id = :userId " +
+            "AND submitted_at >= CURRENT_DATE - INTERVAL '60 days' " +
+            "GROUP BY DATE(submitted_at) ORDER BY date DESC", nativeQuery = true)
+    List<Object[]> getDailyActivityForStreakByUserId(@Param("userId") Long userId);
 }

@@ -16,7 +16,6 @@ import java.util.Map;
 public class WebSocketAuthInterceptor implements HandshakeInterceptor {
 
     private final JwtService jwtService;
-    // Spring WebSocket'in Principal için kullandığı sabit anahtar
     public static final String PRINCIPAL_ATTRIBUTE_NAME = "simp.user";
 
     public WebSocketAuthInterceptor(JwtService jwtService) {
@@ -32,9 +31,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
         if (token != null) {
             try {
                 UserClaims claims = jwtService.extractUserClaims(token);
-                // UserId'yi attributes'e ekle
                 attributes.put("userId", claims.getUserId());
-                // Principal nesnesini Spring'in beklediği attribute adıyla ekle
                 attributes.put(PRINCIPAL_ATTRIBUTE_NAME, new StompPrincipal(String.valueOf(claims.getUserId())));
                 return true;
             } catch (Exception e) {
@@ -47,10 +44,9 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
-        // Gerekirse işlem eklenebilir
+
     }
 
-    // İç sınıf olarak StompPrincipal tanımlıyoruz
     public static class StompPrincipal implements Principal {
         private final String name;
 
