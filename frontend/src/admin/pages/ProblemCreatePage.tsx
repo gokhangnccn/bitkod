@@ -49,7 +49,6 @@ export default function ProblemCreatePage() {
     } finally {
       setLoading(false);
     }
-
   }
 
   return (

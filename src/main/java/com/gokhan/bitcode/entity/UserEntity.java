@@ -4,6 +4,7 @@ import com.gokhan.bitcode.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserEntity {
+public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +39,4 @@ public class UserEntity {
     private Role role;
 
     private boolean enabled = false;
-
-    public String getPassword() {
-        return this.passwordHash;
-    }
 }

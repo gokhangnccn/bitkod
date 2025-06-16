@@ -53,7 +53,6 @@ interface DetailedStats {
   problemStats?: {
     mostSolvedProblems: Array<{ problemId: number; title: string; solveCount: number }>;
     hardestProblems: Array<{ problemId: number; title: string; successRate: number }>;
-    averageSolutionTime: number;
   };
   userPerformance?: {
     mostActiveUsers: Array<{ userId: number; username: string; submissionCount: number }>;
@@ -140,9 +139,6 @@ export default function Dashboard() {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!stats) return null;
 
-  /*
-   * Küçük istatistik kartı — tekrarlı kodu azaltmak ve görsel tutarlılık sağlamak için soyutlandı.
-   */
   const StatCard = ({ title, value }: { title: string; value: number | string }) => (
       <div className="p-4 rounded-lg shadow-sm bg-white dark:bg-zinc-800">
         <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 tracking-wide uppercase">
@@ -154,9 +150,6 @@ export default function Dashboard() {
       </div>
   );
 
-  /*
-   * Grafik veya liste barındıran bölümler için ortak kart bileşeni
-   */
   const ChartCard: React.FC<{ title: string; children: React.ReactNode; heightClass?: string }> = ({ title, children, heightClass = 'h-64' }) => (
       <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow">
         <h3 className="text-lg font-semibold mb-4 dark:text-white">{title}</h3>
@@ -306,7 +299,6 @@ export default function Dashboard() {
           <StatCard title="Kapalı Rapor" value={stats.overview.reportsClosed} />
           <StatCard title="Ort. Gönderim / Kullanıcı" value={stats.overview.averageSubmissionPerUser.toFixed(2)} />
           <StatCard title="Ort. Rapor Çözüm (saat)" value={stats.overview.averageReportResolutionTime.toFixed(1)} />
-          <StatCard title="Ort. Çözüm Süresi (saat)" value={stats.problemStats?.averageSolutionTime?.toFixed(1) ?? '-'} />
           <StatCard title="Ort. Kod Kalitesi" value={stats.userPerformance?.averageCodeQuality?.toFixed(1) ?? '-'} />
         </div>
 

@@ -10,10 +10,19 @@ import {
     Check as CheckIcon,
     X as XIcon,
     Loader2,
+    Flame,
+    Target,
+    Clock,
+    TrendingUp,
+    Award,
+    Calendar,
+    Activity,
+    Zap
 } from 'lucide-react';
 import AdvancedModal from '../components/AdvancedModal';
 import { UserCharts } from '../components/UserCharts';
 import { UserReports } from '../components/UserReports';
+import Loader from '../components/Loader';
 
 interface SubmissionStats {
     totalSubmissions: number;
@@ -24,6 +33,16 @@ interface SubmissionStats {
     submissionsByDay: { date: string; count: number }[];
     submissionsByLanguage: { language: string; count: number }[];
     submissionsByDifficulty: { difficulty: string; count: number }[];
+    hourlyActivity: { hour: number; count: number }[];
+    weeklyTrend: { week: string; count: number }[];
+    successRateOverTime: { date: string; successRate: number }[];
+    currentStreak: { currentStreak: number; longestStreak: number };
+    firstTrySuccessCount: number;
+    averageAttemptsPerProblem: number;
+    thisMonthSolved: number;
+    thisWeekSolved: number;
+    languagePerformance: { language: string; solved: number; successRate: number }[];
+    leaderboardRank: number;
 }
 
 interface UserProfile {
@@ -44,6 +63,7 @@ const AccountPage = () => {
     const [availabilityLoading, setAvailabilityLoading] = useState(false);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [usernameError, setUsernameError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const canSave = !usernameError && usernameAvailable && !updateLoading;
@@ -68,6 +88,7 @@ const AccountPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 // Önce kullanıcı bilgilerini al
                 const userRes = await api.get('/auth/me');
@@ -112,12 +133,24 @@ const AccountPage = () => {
                     averageCodeQualityScore: statsData.averageCodeQualityScore || 0,
                     submissionsByDay: Array.isArray(statsData.submissionsByDay) ? statsData.submissionsByDay : [],
                     submissionsByLanguage: Array.isArray(statsData.submissionsByLanguage) ? statsData.submissionsByLanguage : [],
-                    submissionsByDifficulty: Array.isArray(statsData.submissionsByDifficulty) ? statsData.submissionsByDifficulty : []
+                    submissionsByDifficulty: Array.isArray(statsData.submissionsByDifficulty) ? statsData.submissionsByDifficulty : [],
+                    hourlyActivity: Array.isArray(statsData.hourlyActivity) ? statsData.hourlyActivity : [],
+                    weeklyTrend: Array.isArray(statsData.weeklyTrend) ? statsData.weeklyTrend : [],
+                    successRateOverTime: Array.isArray(statsData.successRateOverTime) ? statsData.successRateOverTime : [],
+                    currentStreak: statsData.currentStreak || { currentStreak: 0, longestStreak: 0 },
+                    firstTrySuccessCount: statsData.firstTrySuccessCount || 0,
+                    averageAttemptsPerProblem: statsData.averageAttemptsPerProblem || 0,
+                    thisMonthSolved: statsData.thisMonthSolved || 0,
+                    thisWeekSolved: statsData.thisWeekSolved || 0,
+                    languagePerformance: Array.isArray(statsData.languagePerformance) ? statsData.languagePerformance : [],
+                    leaderboardRank: statsData.leaderboardRank || 0
                 });
             } catch (err: any) {
                 console.error('Error fetching data:', err);
                 setError(err.response?.data?.Message || err.message || 'Veriler yüklenirken bir hata oluştu');
                 setShowModal(true);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -220,6 +253,16 @@ const AccountPage = () => {
         };
     }, [newUsername]);
 
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800 transition-colors duration-300">
+                <div className="max-w-4xl mx-auto">
+                    <Loader message="İstatistikler yükleniyor..." fullHeight />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800 transition-colors duration-300 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -313,7 +356,7 @@ const AccountPage = () => {
                     {stats && (
                         <>
                             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">İstatistikler</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <StatCard
                                     icon={BarChart2}
                                     label="Toplam Gönderim"
@@ -344,7 +387,95 @@ const AccountPage = () => {
                                     value={stats.averageCodeQualityScore ? stats.averageCodeQualityScore.toFixed(2) : 'N/A'}
                                     color="border-purple-500"
                                 />
+                                <StatCard
+                                    icon={Award}
+                                    label="Sıralama"
+                                    value={stats.leaderboardRank ? `#${stats.leaderboardRank}` : 'N/A'}
+                                    color="border-orange-500"
+                                />
                             </div>
+                            
+                            <div className="mt-8">
+                                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Gelişim Takibi</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <StatCard
+                                        icon={Flame}
+                                        label="Mevcut Streak"
+                                        value={`${stats.currentStreak.currentStreak} gün`}
+                                        color="border-red-500"
+                                    />
+                                    <StatCard
+                                        icon={Target}
+                                        label="En Uzun Streak"
+                                        value={`${stats.currentStreak.longestStreak} gün`}
+                                        color="border-pink-500"
+                                    />
+                                    <StatCard
+                                        icon={Calendar}
+                                        label="Bu Ay Çözülen"
+                                        value={stats.thisMonthSolved}
+                                        color="border-teal-500"
+                                    />
+                                    <StatCard
+                                        icon={Activity}
+                                        label="Bu Hafta Çözülen"
+                                        value={stats.thisWeekSolved}
+                                        color="border-cyan-500"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="mt-8">
+                                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Performans Analizi</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <StatCard
+                                        icon={Zap}
+                                        label="İlk Denemede Başarılı"
+                                        value={stats.firstTrySuccessCount}
+                                        color="border-emerald-500"
+                                    />
+                                    <StatCard
+                                        icon={TrendingUp}
+                                        label="Ortalama Deneme Sayısı"
+                                        value={stats.averageAttemptsPerProblem.toFixed(1)}
+                                        color="border-amber-500"
+                                    />
+                                    <StatCard
+                                        icon={Clock}
+                                        label="En Aktif Saat"
+                                        value={stats.hourlyActivity.length > 0 ? 
+                                            `${stats.hourlyActivity.reduce((max, curr) => curr.count > max.count ? curr : max).hour}:00` : 
+                                            'N/A'}
+                                        color="border-violet-500"
+                                    />
+                                </div>
+                            </div>
+                            
+                            {stats.languagePerformance.length > 0 && (
+                                <div className="mt-8">
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Dil Bazlı Performans</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {stats.languagePerformance.map((lang, index) => (
+                                            <div key={index} className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow border border-gray-200 dark:border-zinc-700">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{lang.language}</p>
+                                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                            {lang.solved} problem
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Başarı Oranı</p>
+                                                        <p className="text-lg font-semibold text-green-600">
+                                                            %{lang.successRate.toFixed(1)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
@@ -357,6 +488,9 @@ const AccountPage = () => {
                             submissionsByDay={stats.submissionsByDay}
                             submissionsByLanguage={stats.submissionsByLanguage}
                             submissionsByDifficulty={stats.submissionsByDifficulty}
+                            hourlyActivity={stats.hourlyActivity}
+                            weeklyTrend={stats.weeklyTrend}
+                            successRateOverTime={stats.successRateOverTime}
                         />
                     </div>
                 )}

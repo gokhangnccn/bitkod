@@ -42,7 +42,7 @@ export default function UsersPage() {
 
   if (loading) return <Loader fullHeight />;
 
-  // FILTERING
+  // filtreleme
   const filtered = users.filter((u) => {
     const q = debouncedSearch.trim().toLowerCase();
     const matchesSearch = !q || u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
@@ -50,7 +50,7 @@ export default function UsersPage() {
     return matchesSearch && matchesRole;
   });
 
-  // SORTING
+  // sıralama
   const sorted = [...filtered].sort((a, b) => {
     const { key, dir } = sort;
     const mult = dir === 'asc' ? 1 : -1;
@@ -59,13 +59,12 @@ export default function UsersPage() {
     return 0;
   });
 
-  // PAGINATION
+  // sayfalama
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * pageSize;
   const paginated = sorted.slice(start, start + pageSize);
 
-  // ACTIONS
   const handleDelete = async (id: number) => {
     if (!confirm('Kullanıcı silinsin mi?')) return;
     try {
@@ -83,7 +82,6 @@ export default function UsersPage() {
     <div>
       <h2 className="text-2xl font-semibold mb-6">Kullanıcılar</h2>
 
-      {/* Toolbar */}
       <div className="mb-4 flex flex-wrap items-center gap-3 bg-white dark:bg-zinc-800 shadow rounded-lg px-4 py-3">
         <div className="relative">
           <input
@@ -134,7 +132,7 @@ export default function UsersPage() {
         </tbody>
       </table>
 
-      {/* Pagination */}
+      {/* Pagination yöntemi */}
       {totalPages > 1 && (
         <div className="flex justify-end mt-3 gap-2 text-sm">
           <button disabled={currentPage === 1} onClick={() => setPage(p => p - 1)} className="px-2 py-1 border rounded disabled:opacity-50">Önceki</button>

@@ -6,6 +6,8 @@ import com.gokhan.bitcode.repository.ProblemReportRepository;
 import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.repository.SubmissionRepository;
 import com.gokhan.bitcode.repository.UserRepository;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,15 +26,18 @@ public class AdminStatsController {
     private final SubmissionRepository submissionRepository;
     private final ProblemReportRepository reportRepository;
     private final ProblemRepository problemRepository;
+    private final CacheManager cacheManager;
 
     public AdminStatsController(UserRepository userRepository,
                                 SubmissionRepository submissionRepository,
                                 ProblemReportRepository reportRepository,
-                                ProblemRepository problemRepository) {
+                                ProblemRepository problemRepository,
+                                CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
         this.reportRepository = reportRepository;
         this.problemRepository = problemRepository;
+        this.cacheManager = cacheManager;
     }
 
     @GetMapping("/overview")
@@ -52,7 +57,13 @@ public class AdminStatsController {
     }
 
     @GetMapping("/detailed")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> detailed(@RequestParam(defaultValue = "30d") String range) {
+    public ApiResponse<Map<String, Object>> detailed(@RequestParam(defaultValue = "30d") String range) {
+        Map<String, Object> data = buildDetailedStats(range);
+        return ApiResponse.success(data);
+    }
+
+    @Cacheable(value = "adminDetailedStats", key = "'detailed:' + #range")
+    public Map<String, Object> buildDetailedStats(String range) {
         // Zaman aralığını hesapla
         LocalDateTime startDate;
         switch (range) {
@@ -110,35 +121,24 @@ public class AdminStatsController {
             currentDate = currentDate.plusDays(1);
         }
 
-        // Kullanıcı rolleri dağılımı
-        List<Map<String, Object>> userRoles = userRepository.findAll().stream()
-            .collect(Collectors.groupingBy(
-                user -> user.getRole().name(),
-                Collectors.counting()
-            ))
-            .entrySet().stream()
-            .map(entry -> {
-                Map<String, Object> roleStats = new HashMap<>();
-                roleStats.put("role", entry.getKey());
-                roleStats.put("count", entry.getValue());
-                return roleStats;
-            })
-            .collect(Collectors.toList());
+        // Kullanıcı rolleri dağılımı (DB'de gruplanmış)
+        List<Object[]> roleRows = userRepository.countByRole();
+        List<Map<String, Object>> userRoles = roleRows.stream()
+            .map(row -> {
+                Map<String, Object> m = new HashMap<>();
+                m.put("role", row[0]);
+                m.put("count", row[1]);
+                return m;
+            }).collect(Collectors.toList());
 
-        // Gönderim durumları
-        List<Map<String, Object>> submissionStatus = submissionRepository.findAll().stream()
-            .collect(Collectors.groupingBy(
-                submission -> submission.getPassed() ? "BAŞARILI" : "BAŞARISIZ",
-                Collectors.counting()
-            ))
-            .entrySet().stream()
-            .map(entry -> {
-                Map<String, Object> statusStats = new HashMap<>();
-                statusStats.put("status", entry.getKey());
-                statusStats.put("count", entry.getValue());
-                return statusStats;
-            })
-            .collect(Collectors.toList());
+        // Gönderim durumları (DB'de gruplanmış)
+        List<Object[]> statusRows = submissionRepository.countBySubmissionStatus();
+        List<Map<String, Object>> submissionStatus = statusRows.stream().map(row -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("status", row[0]);
+            m.put("count", row[1]);
+            return m;
+        }).collect(Collectors.toList());
 
         Map<String, Object> data = new HashMap<>();
         data.put("overview", overview);
@@ -146,7 +146,7 @@ public class AdminStatsController {
         data.put("userRoles", userRoles);
         data.put("submissionStatus", submissionStatus);
 
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return data;
     }
 
     @GetMapping("/llm-usage")
@@ -186,14 +186,10 @@ public class AdminStatsController {
                 return map;
             })
             .collect(Collectors.toList());
-        
-        // Ortalama çözüm süresi
-        Double averageSolutionTime = submissionRepository.calculateAverageSolutionTime();
 
         Map<String, Object> data = new HashMap<>();
         data.put("mostSolvedProblems", mostSolvedProblems);
         data.put("hardestProblems", hardestProblems);
-        data.put("averageSolutionTime", averageSolutionTime);
 
         return ResponseEntity.ok(ApiResponse.success(data));
     }
@@ -343,5 +339,21 @@ public class AdminStatsController {
             return m;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @PostMapping("/clear-cache")
+    public ResponseEntity<ApiResponse<String>> clearCache() {
+        try {
+            // Tüm cache'leri temizle
+            cacheManager.getCacheNames().forEach(cacheName -> {
+                var cache = cacheManager.getCache(cacheName);
+                if (cache != null) {
+                    cache.clear();
+                }
+            });
+            return ResponseEntity.ok(ApiResponse.success("Tüm cache'ler temizlendi"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.serverError());
+        }
     }
 } 

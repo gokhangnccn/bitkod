@@ -6,12 +6,14 @@ import com.gokhan.bitcode.dtos.UsernameUpdateDTO;
 import com.gokhan.bitcode.entity.UserEntity;
 import com.gokhan.bitcode.service.UserService;
 import com.gokhan.bitcode.utils.UserClaims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

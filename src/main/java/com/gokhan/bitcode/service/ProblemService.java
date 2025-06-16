@@ -10,37 +10,112 @@ import com.gokhan.bitcode.repository.ProblemReportRepository;
 import com.gokhan.bitcode.repository.ProblemRepository;
 import com.gokhan.bitcode.utils.UserClaims;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProblemService {
 
     private final ProblemRepository problemRepository;
     private final ProblemReportRepository problemReportRepository;
+    private final CacheManager cacheManager;
 
     private final Map<String, Integer> reportCounts = new ConcurrentHashMap<>();
     private static final int MAX_REPORTS_PER_HOUR = 5;
     private static final int RATE_LIMIT_WINDOW_HOURS = 1;
 
-    public ApiResponse<List<ProblemEntity>> getAllProblems() {
-        return ApiResponse.success(problemRepository.findAll());
+    @Cacheable(value = "problems", key = "'all'")
+    public List<ProblemEntity> getAllProblems() {
+        log.debug(">> [Cache] getAllProblems çağrıldı");
+        List<ProblemEntity> problems = problemRepository.findAll();
+        log.info(">> [Cache] getAllProblems tamamlandı - {} problem bulundu", problems.size());
+        return problems;
     }
 
-    public ApiResponse<ProblemEntity> getProblemByUid(String uid) {
-        return problemRepository.findByUid(uid)
-                .map(ApiResponse::success)
-                .orElse(ApiResponse.problemNotFound());
+    @Cacheable(value = "problems", key = "#uid")
+    public ProblemEntity getProblemByUid(String uid) {
+        log.debug(">> [Cache] getProblemByUid çağrıldı - uid: {}", uid);
+        ProblemEntity problem = problemRepository.findByUid(uid).orElse(null);
+        log.info(">> [Cache] getProblemByUid tamamlandı - uid: {}, bulundu: {}", uid, problem != null);
+        return problem;
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "problems", key = "'all'"),
+            @CacheEvict(value = "problems", key = "#uid")
+    })
+    public ApiResponse<ProblemEntity> updateProblemWithEvict(Long id, ProblemEntity updatedProblem, UserClaims userClaims) {
+        log.debug(">> [Update] Güncelleme başlıyor - id: {}", id);
+        
+        String uid = problemRepository.findById(id)
+                .map(ProblemEntity::getUid)
+                .orElse(null);
+
+        if (uid == null) {
+            log.warn(">> [Update] Problem bulunamadı - id: {}", id);
+            return ApiResponse.problemNotFound();
+        }
+
+        log.info(">> [Cache Evict] Başlıyor - problem:all ve problem:{}", uid);
+        
+        try {
+            // Cache'i manuel olarak temizle
+            Cache cache = Objects.requireNonNull(cacheManager.getCache("problems"), "Cache 'problems' is not configured");
+            cache.evict("all");
+            cache.evict(uid);
+            
+            // Redis'teki tüm problem cache'lerini temizle
+            RedisTemplate<String, Object> redisTemplate = (RedisTemplate<String, Object>) cacheManager.getCache("problems").getNativeCache();
+            if (redisTemplate != null) {
+                redisTemplate.delete("bitcode:problems:*");
+            }
+            
+            log.info(">> [Cache Evict] Cache temizlendi - problem:all ve problem:{}", uid);
+        } catch (Exception e) {
+            log.error(">> [Cache Evict] Hata oluştu", e);
+        }
+
+        return problemRepository.findById(id)
+                .map(existing -> {
+                    log.debug(">> [Update] Mevcut problem bulundu - id: {}, uid: {}", id, uid);
+                    
+                    existing.setTitle(updatedProblem.getTitle());
+                    existing.setDescription(updatedProblem.getDescription());
+                    existing.setDifficulty(updatedProblem.getDifficulty());
+                    existing.setExampleInput(updatedProblem.getExampleInput());
+                    existing.setExampleOutput(updatedProblem.getExampleOutput());
+
+                    ProblemEntity saved = problemRepository.save(existing);
+                    log.info(">> [Update] Problem güncellendi - id: {}, uid: {}", id, uid);
+                    return ApiResponse.success(saved);
+                })
+                .orElseGet(() -> {
+                    log.warn(">> [Update] Problem güncellenemedi - id: {}", id);
+                    return ApiResponse.problemNotFound();
+                });
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "problems", key = "'all'")
+    })
     public ApiResponse<ProblemEntity> createProblem(ProblemEntity problemEntity, UserClaims userClaims) {
         problemEntity.setCreatedBy(userClaims.getUserId());
         problemEntity.setCreatedAt(LocalDateTime.now());
@@ -49,31 +124,25 @@ public class ProblemService {
         return ApiResponse.success(saved);
     }
 
-    public ApiResponse<ProblemEntity> updateProblem(Long id, ProblemEntity updatedProblem, UserClaims userClaims) {
-        return problemRepository.findById(id)
-                .map(existing -> {
-                    existing.setTitle(updatedProblem.getTitle());
-                    existing.setDescription(updatedProblem.getDescription());
-                    existing.setDifficulty(updatedProblem.getDifficulty());
-                    existing.setExampleInput(updatedProblem.getExampleInput());
-                    existing.setExampleOutput(updatedProblem.getExampleOutput());
-
-                    ProblemEntity saved = problemRepository.save(existing);
-                    return ApiResponse.success(saved);
-                })
-                .orElse(ApiResponse.problemNotFound());
-    }
-
     public ApiResponse<Void> deleteProblem(Long id, UserClaims userClaims) {
-        if (!problemRepository.existsById(id)) {
-            return ApiResponse.problemNotFound();
-        }
+        ProblemEntity problem = problemRepository.findById(id).orElse(null);
+        if (problem == null) return ApiResponse.problemNotFound();
+
+        String uid = problem.getUid();
 
         if (!"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
             return ApiResponse.forbidden("Sadece admin kullanıcılar problem silebilir.");
         }
 
         problemRepository.deleteById(id);
+
+        Cache cache = Objects.requireNonNull(
+                cacheManager.getCache("problems"),
+                "Cache 'problems' is not configured in CacheManager"
+        );
+        cache.evict("all");
+        cache.evict(uid);
+
         return ApiResponse.success(null);
     }
 
@@ -126,6 +195,7 @@ public class ProblemService {
                 .build();
     }
 
+    @Cacheable(value = "problemReports", key = "'admin:all'", unless = "#result == null or !#result.succeeded")
     public ApiResponse<List<ProblemReportResponse>> getProblemReports(UserClaims userClaims) {
         if (!"ADMIN".equalsIgnoreCase(userClaims.getRole())) {
             return ApiResponse.forbidden("Sadece admin kullanıcılar raporları görüntüleyebilir.");
@@ -148,6 +218,7 @@ public class ProblemService {
         return ApiResponse.success(response);
     }
 
+    @CacheEvict(value = "problemReports", key = "'admin:all'")
     public ApiResponse<ProblemReportResponse> updateReportStatus(Long reportId, ReportStatus newStatus, 
             String adminResponse, UserClaims userClaims) {
         if (!"ADMIN".equalsIgnoreCase(userClaims.getRole())) {

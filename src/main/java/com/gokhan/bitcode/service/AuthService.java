@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final VerificationTokenRepository tokenRepository;
@@ -37,6 +40,7 @@ public class AuthService {
 
     private final String frontendUrl = "https://www.bitkod.org";
 
+    @CacheEvict(value = "users", key = "'all'", beforeInvocation = true)
     public ApiResponse<AuthResponse> register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username()) ||
                 userRepository.existsByEmail(request.email())) {

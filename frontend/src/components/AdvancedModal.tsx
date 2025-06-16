@@ -1,4 +1,3 @@
-// components/AdvancedModal.tsx
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
 
@@ -11,7 +10,7 @@ interface AdvancedModalProps {
     type?: 'info' | 'success' | 'error' | 'warning';
     confirmText?: string;
     cancelText?: string;
-    autoClose?: number; // in milliseconds
+    autoClose?: number;
 }
 
 const typeConfig = {

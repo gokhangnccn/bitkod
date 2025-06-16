@@ -39,3 +39,4 @@ out/
 src/main/resources/application.properties
 
 docker/python-runner/service-account.json
+.qodo

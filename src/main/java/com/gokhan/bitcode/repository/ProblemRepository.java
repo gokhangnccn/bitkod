@@ -20,7 +20,7 @@ public interface ProblemRepository extends JpaRepository<ProblemEntity, Long> {
             "JOIN submission s ON p.id = s.problem_id " +
             "WHERE s.passed = true " +
             "GROUP BY p.id, p.title " +
-            "ORDER BY solveCount DESC LIMIT 10", nativeQuery = true)
+            "ORDER BY solveCount DESC LIMIT 5", nativeQuery = true)
     List<Object[]> findMostSolvedProblems();
 
     @Query(value = "SELECT p.id as problemId, p.title, " +
@@ -29,7 +29,7 @@ public interface ProblemRepository extends JpaRepository<ProblemEntity, Long> {
             "JOIN submission s ON p.id = s.problem_id " +
             "GROUP BY p.id, p.title " +
             "HAVING COUNT(*) >= 5 " +
-            "ORDER BY successRate ASC LIMIT 10", nativeQuery = true)
+            "ORDER BY successRate ASC LIMIT 5", nativeQuery = true)
     List<Object[]> findHardestProblems();
 
     Page<ProblemEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);

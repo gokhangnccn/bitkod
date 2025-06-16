@@ -105,7 +105,10 @@ export default function ReportsPage() {
     if (!selected) return;
     setStatusUpdating(true);
     try {
-      await api.put(`/admin/reports/${selected.id}/status`, { status, adminResponse });
+      await api.put(`/admin/reports/${selected.id}/status`, {
+        status,
+        ...(adminResponse && { adminResponse })
+      });
       setReports((prev) =>
         prev.map((r) =>
           r.id === selected.id ? { ...r, status, adminResponse } : r

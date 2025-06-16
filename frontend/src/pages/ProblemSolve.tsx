@@ -62,7 +62,6 @@ export function ProblemSolve() {
     const [loading, setLoading] = useState(false);
     const [refactorResult, setRefactorResult] = useState<string | null>(null);
 
-    // Refs to prevent rapid multiple clicks
     const isWhyRequestInProgress = useRef(false);
     const isRefactorRequestInProgress = useRef(false);
 

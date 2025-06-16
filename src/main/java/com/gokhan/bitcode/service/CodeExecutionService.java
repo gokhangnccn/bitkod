@@ -32,14 +32,22 @@ import java.util.stream.Collectors;
 public class CodeExecutionService {
 
     private final TestCaseRepository testCaseRepository;
+    
+    // Docker image'ları - kendi hazırlanan runtime ortamları
     private final String javaDockerImage = "gokhangnccn/java-runner:latest";
     private final String pythonDockerImage = "gokhangnccn/python-runner:latest";
     private final KubernetesClient kubernetesClient;
 
+    /*
+      Ana metod: Kullanıcı kodunu alır, test eder ve sonucu döner
+      Async sayesinde non-blocking olarak çalışır
+     */
     @Async("codeRunnerExecutor")
     public CompletableFuture<Boolean> executeAndEvaluateCode(SubmissionEntity submission, ProblemEntity problem) {
+        // Problem için tanımlanmış test case'leri getir
         List<TestCaseEntity> testCases = testCaseRepository.findByProblemId(problem.getId());
 
+        // Programlama dili kontrolü
         String language = submission.getLanguage();
         if (language == null) {
             submission.setPassed(false);
@@ -48,21 +56,26 @@ public class CodeExecutionService {
         }
         language = language.toLowerCase();
 
+        // Her submission için benzersiz bir çalışma klasörü oluştur
         String uniqueId = UUID.randomUUID().toString();
         Path folderPath = Path.of("/opt/runner", uniqueId);
         String fileName;
         String codeToExecute;
 
         try {
+            // Çalışma klasörünü oluştur
             Files.createDirectories(folderPath);
 
+            // Dile göre kod formatını hazırla
             switch (language) {
                 case "java" -> {
                     fileName = "UserSolution.java";
+                    // Java kodu için class wrapper ekle
                     codeToExecute = wrapJavaCode(submission.getCode(), "UserSolution");
                 }
                 case "python" -> {
                     fileName = "UserSolution.py";
+                    // Python kodu direkt kullanılabilir
                     codeToExecute = submission.getCode();
                 }
                 default -> {
@@ -73,13 +86,13 @@ public class CodeExecutionService {
                 }
             }
 
-            // Kod dosyasını yaz
+            // Kod dosyasını persistent volume'a yaz
             Files.writeString(folderPath.resolve(fileName), codeToExecute, StandardCharsets.UTF_8);
 
-            // Dosya yazma işleminin tamamlanmasını bekle
+            // Dosya sisteminin senkronize olmasını bekle
             Thread.sleep(1000);
 
-            // Dosyanın gerçekten yazıldığını kontrol et
+            // Dosyanın gerçekten oluştuğunu doğrula
             if (!Files.exists(folderPath.resolve(fileName))) {
                 log.error("File was not created: {}", folderPath.resolve(fileName));
                 throw new RuntimeException("Kod dosyası oluşturulamadı");
@@ -87,6 +100,7 @@ public class CodeExecutionService {
             
             log.info("Code file created successfully: {}", folderPath.resolve(fileName));
 
+            // Kubernetes'te kodu çalıştır ve sonuçları al
             List<String> outputs;
             try {
                 outputs = runCodeInKubernetes(language, folderPath, fileName, testCases);
@@ -98,6 +112,7 @@ public class CodeExecutionService {
                 return CompletableFuture.completedFuture(false);
             }
 
+            // Çıktı sayısı kontrolü - her test case için bir çıktı olmalı
             if (outputs.size() != testCases.size()) {
                 submission.setPassed(false);
                 submission.setErrorMessage("Test çıktısı sayısı beklenenden farklı. Beklenen: " + testCases.size() + ", Alınan: " + outputs.size());
@@ -105,9 +120,12 @@ public class CodeExecutionService {
                 return CompletableFuture.completedFuture(false);
             }
 
+            // Her test case için beklenen çıktı ile karşılaştır
             for (int i = 0; i < testCases.size(); i++) {
                 String expectedOutput = testCases.get(i).getExpectedOutput();
                 String output = outputs.get(i);
+                
+                // Çıktıları normalize et ve karşılaştır (whitespace temizleme)
                 if (!normalize(output).equals(normalize(expectedOutput))) {
                     submission.setPassed(false);
                     submission.setOutput(output);
@@ -117,6 +135,7 @@ public class CodeExecutionService {
                 }
             }
 
+            // Tüm testler başarılı!
             submission.setPassed(true);
             submission.setOutput("Tüm testler başarıyla geçti.");
             return CompletableFuture.completedFuture(true);
@@ -127,10 +146,15 @@ public class CodeExecutionService {
             submission.setErrorMessage("Sistem hatası: " + e.getMessage());
             return CompletableFuture.completedFuture(false);
         } finally {
+            // Çalışma klasörünü temizle
             cleanup(folderPath);
         }
     }
 
+    /**
+     * Java kodu için class wrapper ekler
+     * Kullanıcı sadece method yazdığı için, bunu executable class haline getirir
+     */
     private String wrapJavaCode(String code, String className) {
         return String.format("""
                 import java.util.*;
@@ -142,13 +166,17 @@ public class CodeExecutionService {
                 """, className, code);
     }
 
+    /**
+     * Kubernetes Job oluşturup kodu çalıştıran ana metod
+     * Her test case için ayrı input vererek sonuçları toplar
+     */
     private List<String> runCodeInKubernetes(String language, Path folderPath, String fileName, List<TestCaseEntity> testCases) throws Exception {
-        // Tüm test girdilerini ayrı dosyalara yaz
+        // Tüm test case inputlarını ayrı dosyalara yaz
         for (int i = 0; i < testCases.size(); i++) {
             Files.writeString(folderPath.resolve("input_" + i + ".txt"), testCases.get(i).getInput(), StandardCharsets.UTF_8);
         }
 
-        // Dosyaların hazır olmasını bekle
+        // Persistent volume senkronizasyonunu bekle
         log.info("Waiting for files to be available in volume: {}", folderPath);
         int retryCount = 0;
         while ((!Files.exists(folderPath.resolve("input_0.txt")) || !Files.exists(folderPath.resolve(fileName))) && retryCount < 20) {
@@ -160,26 +188,30 @@ public class CodeExecutionService {
             throw new RuntimeException("Dosyalar oluşturulamadı");
         }
 
-        // Volume senkronizasyonu için küçük bekleme
+        // Ek senkronizasyon bekleme süresi
         Thread.sleep(1000);
 
+        // Benzersiz job ismi oluştur
         String jobName = language + "-runner-job-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String imageName = language.equals("java") ? javaDockerImage : pythonDockerImage;
         String uuidFolder = folderPath.getFileName().toString();
 
+        // Çıktıları ayırmak için delimiter
         final String delimiter = "---END---";
 
+        // Dile göre çalıştırma komutu hazırla
         String runCommand = language.equals("java")
                 ? String.format(
                 "cd /opt/runner/%s && " +
-                        "javac %s && " +
-                        "for f in input_*.txt; do java UserSolution < \"$f\"; echo '%s'; done",
+                        "javac %s && " + // Java dosyasını derle
+                        "for f in input_*.txt; do java UserSolution < \"$f\"; echo '%s'; done", // Her input için çalıştır
                 uuidFolder, fileName, delimiter)
                 : String.format(
                 "cd /opt/runner/%s && " +
-                        "for f in input_*.txt; do python3 %s < \"$f\"; echo '%s'; done",
+                        "for f in input_*.txt; do python3 %s < \"$f\"; echo '%s'; done", // Python için direkt çalıştır
                 uuidFolder, fileName, delimiter);
 
+        // Kubernetes Job tanımını oluştur
         Job job = new JobBuilder()
                 .withNewMetadata()
                 .withName(jobName)
@@ -187,7 +219,7 @@ public class CodeExecutionService {
                 .addToLabels("session-id", uuidFolder)
                 .endMetadata()
                 .withNewSpec()
-                .withBackoffLimit(0) // Yeniden deneme yapma
+                .withBackoffLimit(0) // Hata durumunda yeniden deneme yapma
                 .withTtlSecondsAfterFinished(300) // 5 dakika sonra otomatik temizle
                 .withNewTemplate()
                 .withNewMetadata()
@@ -195,7 +227,9 @@ public class CodeExecutionService {
                 .addToLabels("session-id", uuidFolder)
                 .endMetadata()
                 .withNewSpec()
-                .withNodeName("gke-bitkod-cluster-ssd-pool-d34b4444-99m4")
+                .withNodeName("gke-bitkod-cluster-ssd-pool-d34b4444-nugb") // Belirli node'da çalıştır
+                
+                // İlk olarak dosya izinlerini düzelt
                 .addNewInitContainer()
                 .withName("fix-permissions")
                 .withImage("busybox:1.35")
@@ -205,9 +239,11 @@ public class CodeExecutionService {
                 .withMountPath("/opt/runner")
                 .endVolumeMount()
                 .withNewSecurityContext()
-                .withRunAsUser(0L) // Root olarak çalıştır permission fix için
+                .withRunAsUser(0L) // Root yetkisiyle permission fix
                 .endSecurityContext()
                 .endInitContainer()
+                
+                // Ana container - kullanıcı kodunu çalıştır
                 .addNewContainer()
                 .withName(language + "-runner")
                 .withImage(imageName)
@@ -216,18 +252,24 @@ public class CodeExecutionService {
                 .withName("code-volume")
                 .withMountPath("/opt/runner")
                 .endVolumeMount()
+                
+                // Kaynak limitleri - güvenlik için önemli
                 .withNewResources()
-                .addToLimits("memory", Quantity.parse("256Mi"))
-                .addToLimits("cpu", Quantity.parse("500m"))
-                .addToRequests("memory", Quantity.parse("128Mi"))
-                .addToRequests("cpu", Quantity.parse("100m"))
+                .addToLimits("memory", Quantity.parse("256Mi")) // Max 256MB RAM
+                .addToLimits("cpu", Quantity.parse("500m"))     // Max %50 CPU
+                .addToRequests("memory", Quantity.parse("128Mi")) // Min 128MB RAM
+                .addToRequests("cpu", Quantity.parse("100m"))     // Min %10 CPU
                 .endResources()
+                
+                // Güvenlik ayarları - non-root user
                 .withNewSecurityContext()
                 .withRunAsUser(1000L)
                 .withRunAsGroup(1000L)
                 .endSecurityContext()
                 .endContainer()
-                .withRestartPolicy("Never")
+                .withRestartPolicy("Never") // Hata durumunda yeniden başlatma
+                
+                // Persistent Volume bağlantısı
                 .addNewVolume()
                 .withName("code-volume")
                 .withNewPersistentVolumeClaim()
@@ -240,13 +282,13 @@ public class CodeExecutionService {
                 .build();
 
         try {
+            // Job'ı Kubernetes cluster'ına gönder
             kubernetesClient.batch().v1().jobs().inNamespace("default").create(job);
             log.info("Job created: {}", jobName);
 
-            // Job tamamlanmasını bekle
-            int maxTries = 30; // 30 saniye
+            // Job'ın tamamlanmasını bekle (max 30 saniye)
+            int maxTries = 30;
             boolean jobCompleted = false;
-            String failureReason = "";
 
             for (int i = 0; i < maxTries; i++) {
                 Job currentJob = kubernetesClient.batch().v1().jobs().inNamespace("default").withName(jobName).get();
@@ -255,12 +297,13 @@ public class CodeExecutionService {
                     Integer failed = currentJob.getStatus().getFailed();
 
                     if (succeeded != null && succeeded > 0) {
+                        // Job başarıyla tamamlandı
                         jobCompleted = true;
                         break;
                     }
 
                     if (failed != null && failed > 0) {
-                        // Pod loglarını ve durumunu detaylı olarak al
+                        // Job başarısız oldu - detaylı hata bilgisi al
                         PodList pods = kubernetesClient.pods()
                                 .inNamespace("default")
                                 .withLabel("job-name", jobName)
@@ -272,7 +315,7 @@ public class CodeExecutionService {
                             Pod pod = pods.getItems().get(0);
                             String podName = pod.getMetadata().getName();
                             
-                            // Pod durumu
+                            // Pod durumu bilgilerini topla
                             if (pod.getStatus() != null) {
                                 errorDetails.append("\nPod Status: ").append(pod.getStatus().getPhase());
                                 
@@ -290,7 +333,7 @@ public class CodeExecutionService {
                                 }
                             }
                             
-                            // Pod logları
+                            // Pod loglarını al
                             try {
                                 String logs = kubernetesClient.pods()
                                         .inNamespace("default")
@@ -310,11 +353,11 @@ public class CodeExecutionService {
                         throw new RuntimeException(errorDetails.toString());
                     }
                 }
-                Thread.sleep(1000);
+                Thread.sleep(1000); // 1 saniye bekle
             }
 
             if (!jobCompleted) {
-                // Timeout durumunda da detaylı bilgi al
+                // Timeout durumu - detaylı bilgi al
                 PodList pods = kubernetesClient.pods()
                         .inNamespace("default")
                         .withLabel("job-name", jobName)
@@ -344,7 +387,7 @@ public class CodeExecutionService {
                 throw new RuntimeException(timeoutDetails.toString());
             }
 
-            // Pod loglarını al
+            // Başarılı job'ın loglarını al
             PodList pods = kubernetesClient.pods()
                     .inNamespace("default")
                     .withLabel("job-name", jobName)
@@ -360,7 +403,7 @@ public class CodeExecutionService {
                     .withName(pod.getMetadata().getName())
                     .getLog();
 
-            // Log'u ayrıştır
+            // Logları ayrıştır - her test case için ayrı çıktı
             String rawLogs = logs != null ? logs.trim() : "";
             List<String> outputs = Arrays.stream(rawLogs.split(delimiter))
                     .map(String::trim)
@@ -370,7 +413,7 @@ public class CodeExecutionService {
             return outputs;
 
         } finally {
-            // Job temizliği
+            // Job'ı temizle - kaynak tasarrufu için
             try {
                 Thread.sleep(2000); // Logları almak için biraz bekle
                 kubernetesClient.batch().v1().jobs().inNamespace("default").withName(jobName).delete();
@@ -381,11 +424,15 @@ public class CodeExecutionService {
         }
     }
 
+    /**
+     * Geçici dosyaları ve klasörleri temizler
+     * Disk alanı tasarrufu için önemli
+     */
     private void cleanup(Path folderPath) {
         try {
             if (Files.exists(folderPath)) {
                 Files.walk(folderPath)
-                        .sorted(Comparator.reverseOrder())
+                        .sorted(Comparator.reverseOrder()) // Önce dosyalar, sonra klasörler
                         .forEach(path -> {
                             try {
                                 Files.deleteIfExists(path);
@@ -399,6 +446,10 @@ public class CodeExecutionService {
         }
     }
 
+    /**
+     * String çıktıları normalize eder
+     * Farklı işletim sistemlerindeki line ending farklılıklarını giderir
+     */
     private String normalize(String str) {
         if (str == null) return "";
         return str.trim().replace("\r\n", "\n").replace("\r", "\n");

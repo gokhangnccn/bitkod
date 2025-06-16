@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class TestCaseService {
     private final TestCaseRepository testCaseRepository;
     private final ProblemRepository problemRepository;
 
+    @Cacheable(value = "testCases", key = "#problemId")
     public ApiResponse<List<TestCaseDTO>> getTestCasesByProblemId(Long problemId) {
         try {
             List<TestCaseEntity> testCases = testCaseRepository.findByProblemId(problemId);
@@ -38,6 +42,9 @@ public class TestCaseService {
         }
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public ApiResponse<TestCaseDTO> createTestCase(TestCaseDTO dto, UserClaims userClaims) {
         try {
             Optional<ProblemEntity> problemOpt = problemRepository.findById(dto.getProblemId());
@@ -68,6 +75,9 @@ public class TestCaseService {
         }
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "testCases", allEntries = true)
+    })
     public ApiResponse<Void> deleteTestCase(Long id, UserClaims userClaims) {
         try {
             Optional<TestCaseEntity> testCaseOpt = testCaseRepository.findById(id);

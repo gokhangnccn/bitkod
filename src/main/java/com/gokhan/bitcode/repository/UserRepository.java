@@ -34,5 +34,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "HAVING COUNT(*) >= 5 " +
             "ORDER BY successRate DESC LIMIT 10", nativeQuery = true)
     List<Object[]> findMostSuccessfulUsers();
+
+    @Query("SELECT u.role as role, COUNT(u) as cnt FROM UserEntity u GROUP BY u.role")
+    List<Object[]> countByRole();
 }
 

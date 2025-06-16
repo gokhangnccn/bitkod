@@ -70,6 +70,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+	implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.17.1")
 }
 
 jacoco {

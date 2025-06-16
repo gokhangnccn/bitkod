@@ -26,6 +26,15 @@ public class LLMFeedbackWorker {
         log.info("Kuyruktaki Gorevler: {}", size);
 
         Object obj = redisTemplate.opsForList().leftPop(QUEUE_NAME);
+        
+        if (obj == null) {
+            log.debug("Kuyruktan alınan obje null");
+            return;
+        }
+        
+        log.info("Kuyruktan alınan objection türü: {}", obj.getClass().getName());
+        log.info("Obje içeriği: {}", obj.toString());
+        
         if (obj instanceof FeedbackTask task) {
             log.info("Gorev alındı. SubmissionId: {}, Tur: {}", task.submissionId(), task.type());
 
@@ -85,6 +94,8 @@ public class LLMFeedbackWorker {
 
                 }
             }, () -> log.warn("Submission bulunamadi. ID: {}", task.submissionId()));
+        } else {
+            log.error("Kuyruktan alınan obje FeedbackTask değil! Tip: {}", obj.getClass().getName());
         }
     }
 }

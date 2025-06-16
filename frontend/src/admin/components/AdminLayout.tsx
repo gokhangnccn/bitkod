@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import logoLight from '../../assets/bitkod_light.png';
 import logoDark from '../../assets/bitkod_dark.png';
 import {
   LayoutDashboard,
