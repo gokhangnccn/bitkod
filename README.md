@@ -1,143 +1,170 @@
-BİTKOD 🚀
+# 🚀 Bitkod
 
-BİTKOD, kullanıcıların algoritma problemlerini çözebileceği, çözümlerini paylaşabileceği ve LLM destekli geri bildirimler alabileceği modern bir web uygulamasıdır. Platform, Google Cloud Kubernetes Engine (GKE) üzerinde çalışan, güvenli ve izole kod çalıştırma ortamları sunan bir backend ile React tabanlı kullanıcı dostu bir arayüze sahiptir.
+**Bitkod**, yazılım geliştiricilerin ve öğrencilerin algoritma problemleri üzerinde pratik yapmalarına olanak tanıyan modern ve kapsamlı bir platformdur. Kullanıcılar, çözümlerini paylaşabilir, yapay zeka destekli (LLM) geri bildirimler alabilir ve ilerlemelerini takip edebilir.
 
-Erişim Adresleri:
+Platform, Google Cloud Kubernetes Engine (GKE) üzerinde çalışan, güvenli ve izole kod yürütme ortamları sunan bir backend ile React tabanlı kullanıcı dostu bir frontend arayüzünden oluşmaktadır.
 
-Ana Platform: https://www.bitkod.org (Varsayılan)
+---
 
-Yönetim Paneli: https://admin.bitkod.org (Varsayılan)
+## 🌐 Erişim Adresleri
 
-API: https://api.bitkod.org (Varsayılan)
+| Bileşen         | Adres                                 |
+|-----------------|----------------------------------------|
+| Ana Platform    | [bitkod.org](https://www.bitkod.org)   |
+| Yönetim Paneli  | [admin.bitkod.org](https://admin.bitkod.org) |
+| API             | [api.bitkod.org](https://api.bitkod.org)     |
 
-📑 İçindekiler
-🎯 Hakkında
+---
+
+## 📑 İçindekiler
 
-✨ Temel Özellikler
+- [🎯 Hakkında](#-hakkında)
+- [✨ Temel Özellikler](#-temel-özellikler)
+- [🛠️ Teknoloji Yığını](#-teknoloji-yığını)
+- [🏗️ Mimari Genel Bakış](#-mimari-genel-bakış)
+- [📁 Proje Yapısı](#-proje-yapısı)
+- [🚀 Kurulum ve Çalıştırma](#-kurulum-ve-çalıştırma)
+- [⚙️ API](#-api)
+- [🧪 Testler](#-testler)
+- [🤝 Katkıda Bulunma](#-katkıda-bulunma)
+- [📄 Lisans](#-lisans)
+- [📧 İletişim](#-iletişim)
 
-🛠️ Teknoloji Yığını
+---
 
-🏗️ Mimari Genel Bakış
+## 🎯 Hakkında
 
-📁 Proje Yapısı
+Bitkod, aşağıdaki temel sorunlara çözüm sunmak üzere tasarlanmıştır:
 
-🚀 Kurulum ve Çalıştırma
+- 🚫 Güvenli ve izole kod çalıştırma altyapısının eksikliği  
+- ⚠️ Kod çözümlerine yönelik hızlı ve yapıcı geri bildirim eksikliği  
+- 🔍 Modern, kullanıcı dostu ve üretkenliğe yönelik bir algoritma pratik platformu ihtiyacı  
 
-Ön Koşullar
+Bitkod bu ihtiyaçlara şu çözümleri sunar:
 
-Backend Kurulumu
+- GKE üzerinde dinamik olarak oluşturulan Kubernetes Job'ları ile izole kod yürütme  
+- LLM isteklerinin Redis tabanlı kuyruk sistemi üzerinden asenkron işlenmesi  
+- React tabanlı kullanıcı arayüzü ve yönetim paneli  
+- E-posta doğrulama, şifre sıfırlama ve OAuth2 ile giriş gibi kullanıcı yönetimi özellikleri  
 
-Frontend Kurulumu
+---
 
-Runner İmajları Oluşturma
+## ✨ Temel Özellikler
 
-Docker Compose ile Yerel Çalıştırma
+- 👤 **Kullanıcı Yönetimi:** Kayıt, giriş (Google OAuth2 destekli), e-posta doğrulama, şifre sıfırlama  
+- 🧩 **Problem Çözümü:** Farklı zorluk seviyelerinde algoritma problemleri, çözüm gönderimi  
+- 🛡️ **Güvenli Kod Yürütme:** Java ve Python çözümleri GKE üzerinde izole ortamda çalıştırılır  
+- 🧠 **LLM Geri Bildirimleri:** Yapay zeka destekli çözüm değerlendirme ve öneriler  
+- 📡 **WebSocket Bildirimleri:** Anlık geri bildirim ve kod çalıştırma sonuçları  
+- 📊 **Yönetim Paneli:** Kullanıcı, problem ve çözüm yönetimi + sistem istatistikleri  
+- 🏆 **Liderlik Tablosu:** Başarı puanlarına göre sıralama  
+- 🔗 **RESTful API:** Frontend ve diğer istemcilerle iletişim için  
+- 🎨 **Tema Desteği:** Açık/koyu mod  
+- 🚩 **Problem Raporlama:** Kullanıcıdan gelen hata/sorun bildirimleri  
 
-Kubernetes (GKE) Dağıtımı
+---
 
-⚙️ API
+## 🛠️ Teknoloji Yığını
 
-🧪 Testler
+### Backend (`/src`)
 
-🤝 Katkıda Bulunma
+- **Dil / Çerçeve:** Java 21, Spring Boot 3.x
+- **Modüller:** Web, WebFlux, JPA, Security, OAuth2 Client, WebSocket, Redis, Actuator
+- **Veritabanları:**
+  - PostgreSQL (ana veri deposu)
+  - Redis (cache, session, LLM kuyruğu)
+- **Güvenlik:** Spring Security, JWT
+- **LLM:** Harici LLM API entegrasyonu (konfigürasyonla değiştirilebilir)
+- **Kubernetes:** `fabric8` client ile dinamik Job yönetimi
+- **E-posta:** Gmail Workspace, Spring Boot Mail
+- **Diğer:** Lombok, MapStruct
 
-📄 Lisans
+### Frontend (`/frontend`)
 
-📧 İletişim
+- **Framework:** React (Vite + TypeScript)
+- **Stil:** TailwindCSS, lucide-react, sonner
+- **Yönlendirme:** React Router DOM
+- **Durum Yönetimi:** React Context API, özel hook'lar
+- **Formlar:** React Hook Form + Zod
+- **API:** Axios, SockJS, StompJS
+- **Kod Editörü:** Monaco Editor (veya benzeri)
+- **Grafikler:** Recharts (veya Chart.js)
+- **Lint / Format:** ESLint, Prettier
 
-🎯 Hakkında
-Bitkod, yazılım geliştiricilerin ve öğrencilerin algoritma çözme becerilerini geliştirmelerine yardımcı olmak amacıyla tasarlanmış kapsamlı bir platformdur. Temel motivasyonu, kullanıcılara güvenli, izole ve modern bir ortamda pratik yapma imkanı sunarken, aynı zamanda gönderdikleri çözümler hakkında yapay zeka destekli (LLM) derinlemesine geri bildirimler sağlamaktır.
+---
 
-Proje, aşağıdaki temel problemleri çözmeyi hedefler:
+## 🏗️ Mimari Genel Bakış
 
-Güvenli ve izole kod çalıştırma ortamlarının eksikliği.
+- **Frontend:** React + Nginx (Docker imajı içinde)
+- **Backend:** Spring Boot uygulaması (REST API + WebSocket + Security)
+- **Runner:** GKE üzerinde çalışan Java/Python kod yürüten Kubernetes Job’ları
+- **LLM Kuyruğu:** Redis üzerinden asenkron işleme
+- **Veri:** PostgreSQL & Redis
+- **Dağıtım:** GKE + Docker + Kubernetes manifest dosyaları
 
-Kullanıcı çözümlerine yönelik anlık ve yapıcı geri bildirimlerin yetersizliği.
+---
 
-Modern teknolojilerle geliştirilmiş, kullanıcı dostu ve kapsamlı bir pratik platformu ihtiyacı.
+## 📁 Proje Yapısı
 
-Bitkod, bu problemlere Google Cloud Kubernetes Engine (GKE) üzerinde dinamik olarak oluşturulan Kubernetes Job'ları ile (Java ve Python için ayrı runner imajları kullanarak) izole kod çalıştırma, LLM isteklerinin Redis tabanlı bir kuyruk sistemi üzerinden asenkron yönetimi ve kapsamlı bir yönetim paneli gibi yenilikçi çözümler sunar. Ayrıca, e-posta ile hesap doğrulama ve şifre sıfırlama gibi temel kullanıcı yönetimi işlevlerini de içerir.
+bitkod/
+├── frontend/ # React frontend
+├── src/ # Spring Boot backend
+├── docker/
+│ ├── code-runner/ # Java kod çalıştırıcı Dockerfile
+│ └── python-runner/ # Python kod çalıştırıcı Dockerfile
+├── k8s/ # Kubernetes manifest dosyaları
+├── docker-compose.yml # Yerel geliştirme ortamı
+└── README.md
 
-✨ Temel Özellikler
-👤 Kullanıcı Yönetimi: Kayıt olma, e-posta ile hesap doğrulama, giriş yapma (Google OAuth2 ile de), şifre sıfırlama, profil yönetimi.
+---
 
-🧩 Problem Listeleme ve Çözme: Çeşitli zorluk seviyelerinde algoritmik problemleri listeleme, detaylarını görüntüleme ve çözüm gönderme.
+## 🚀 Kurulum ve Çalıştırma
 
-🛡️ Güvenli ve İzole Kod Çalıştırma: Java ve Python dillerinde gönderilen kodların, GKE üzerinde dinamik olarak oluşturulan ve özel Docker imajları kullanan Kubernetes Job'ları ile güvenli ve izole bir şekilde çalıştırılması.
+### ✅ Ön Koşullar
 
-🧠 LLM Destekli Geri Bildirim: Gönderilen kod çözümleri için yapay zeka modeli (LLM) aracılığıyla kod incelemesi, yeniden düzenleme önerileri ve kalite değerlendirmesi gibi geri bildirimlerin Redis kuyruk sistemi üzerinden asenkron olarak sağlanması.
+- Docker & Docker Compose
+- Node.js & npm
+- Java 21
+- PostgreSQL & Redis
+- Google Cloud SDK (GKE için)
 
-📡 Anlık Bildirimler: Kod çalıştırma sonuçları ve LLM geri bildirimleri gibi önemli güncellemelerin WebSocket aracılığıyla kullanıcılara anlık olarak iletilmesi.
+### 🔧 Backend Kurulumu
 
-📊 Yönetim Paneli (admin.bitkod.org): Kullanıcıları, problemleri, gönderilen çözümleri ve raporları yönetmek için ayrı bir arayüz. Sistem istatistiklerini görüntüleme.
+cd src
+./gradlew build
 
-🏆 Liderlik Tablosu: Kullanıcıların başarılarına göre sıralandığı bir liderlik tablosu.
+### 💻 Frontend Kurulumu
 
-🔗 API (api.bitkod.org): Frontend ve potansiyel diğer istemciler için RESTful API.
+cd frontend
+npm install
+npm run dev
 
-🎨 Tema Desteği: Açık ve koyu tema seçenekleri.
+### 🧪 Runner İmajları
+docker build -t java-runner:latest ./docker/code-runner
+docker build -t python-runner:latest ./docker/python-runner
 
-🚩 Problem Raporlama: Kullanıcıların problemlerdeki hataları veya sorunları raporlayabilmesi.
+### 🧩 Docker Compose (Yerel)
+docker-compose up
 
-🛠️ Teknoloji Yığını
-Backend (src/)
-Dil & Çerçeve: Java 21, Spring Boot 3.x (Web, Data JPA, Security, WebSocket, OAuth2 Client, Mail, Data Redis, Actuator, WebFlux)
+### ☁️ Kubernetes (GKE)
+kubectl apply -f k8s/
 
-Build Aracı: Gradle (build.gradle.kts) 
+### ⚙️ API
+Tüm RESTful endpointler Swagger/OpenAPI dokümantasyonu ile erişilebilir. Detaylar için https://api.bitkod.org adresini ziyaret edebilirsiniz.
 
-Veritabanları:
+### 🧪 Testler
+Backend: JUnit 5, Mockito, Spring Boot Test, Reactor Test, Spring Security Test
 
-PostgreSQL  (Ana veri deposu)
+Frontend: (Planlama aşamasında) Jest + React Testing Library önerilir
 
-Redis  (Önbellekleme, oturum yönetimi, LLM istek kuyruğu)
+### 🤝 Katkıda Bulunma
+Katkılarınızı memnuniyetle karşılıyoruz! PR göndererek ya da sorun bildirerek destek olabilirsiniz. Daha fazla bilgi için CONTRIBUTING.md dosyasına göz atın.
 
-Güvenlik: Spring Security, JWT (JSON Web Tokens)
+### 📄 Lisans
+Bu proje MIT Lisansı ile lisanslanmıştır. Ayrıntılar için LICENSE dosyasını inceleyebilirsiniz.
 
-LLM Entegrasyonu: Belirli bir LLM API'si ile entegrasyon (application.properties üzerinden yapılandırılır)
+### 📧 İletişim
+Her türlü öneri, hata bildirimi ya da katkı için bizimle iletişime geçin:
+📬 gokhangnccn@gmail.com
 
-Kubernetes İstemcisi: io.fabric8:kubernetes-client (Dinamik Job yönetimi için)
-
-E-posta: Spring Boot Mail, Workspace Gmail (Hesap doğrulama, şifre sıfırlama)
-
-Diğer: Lombok, MapStruct
-
-Frontend (frontend/)
-Kütüphane & Araçlar: React, Vite, TypeScript
-
-Stil: TailwindCSS , lucide-react (ikonlar), sonner (bildirimler)
-
-Yönlendirme: React Router DOM
-
-Durum Yönetimi: React Context API, Özel Hook'lar (useDebounce, useWebSocket)
-
-API İletişimi: Axios, SockJS-Client, StompJS
-
-Form Yönetimi: React Hook Form, Zod (doğrulama)
-
-Kod Editörü: Monaco Editor (veya benzeri, EnhancedCodeEditor.tsx ile) 
-
-Grafikler: Recharts (veya Chart.js, UserCharts.tsx ile)
-
-Linting & Formatlama: ESLint, Prettier
-
-DevOps & Altyapı
-Konteynerizasyon: Docker 
-
-Dockerfile (Backend uygulaması için)
-
-frontend/Dockerfile (Frontend uygulamasını Nginx ile sunmak için)
-
-docker/code-runner/Dockerfile (Java kod çalıştırma ortamı)
-
-docker/python-runner/Dockerfile (Python kod çalıştırma ortamı)
-
-Orkestrasyon: Kubernetes (Google Kubernetes Engine - GKE)  
-
-Manifestler k8s/ dizininde (Deployment, Service, Job, Ingress, ManagedCertificate vb.)
-
-Yerel Geliştirme: Docker Compose (docker-compose.yml ile Redis ve runner servisleri)
-
-Web Sunucusu (Frontend için): Nginx (Frontend Docker imajı içinde) 
-
-Test
-Backend: JUnit 5, Mockito, Spring Boot Test, Reactor Test, Spring Security
+---
